@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //import 'urunlerim_screen.dart';
 
+
+
 Future<void> registerUser(String isim, String soyisim, String kullaniciAdi, String sifre, String telefon) async {
   final url = Uri.parse("http://10.0.2.2/kullanici_api/register_user.php"); // PHP dosyasının URL'si
 
@@ -31,6 +33,110 @@ Future<void> registerUser(String isim, String soyisim, String kullaniciAdi, Stri
   }
 }
 
+class UsersProducts extends StatefulWidget {
+  @override
+  _UsersProductsState createState() => _UsersProductsState();
+}
+
+class _UsersProductsState extends State<UsersProducts> {
+  List<dynamic> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+  }
+
+  Future<void> fetchProducts() async {
+    // PHP backend URL
+    final url = 'https://yourdomain.com/products.php';
+
+    // HTTP isteği gönder
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // JSON verisini parse et
+      setState(() {
+        products = json.decode(response.body);
+      });
+    } else {
+      // Hata durumunda
+      print('Veriler çekilemedi!');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Ürünlerim"),
+        backgroundColor: Colors.green,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: products.isEmpty
+            ? Center(child: CircularProgressIndicator()) // Veri yükleniyor göstergesi
+            : GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // İki sütunlu grid
+            crossAxisSpacing: 20, // Sütunlar arasındaki boşluk
+            mainAxisSpacing: 20, // Satırlar arasındaki boşluk
+            childAspectRatio: 1, // Hücrelerin oranı
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return GestureDetector(
+              onTap: () {
+                // Ürün tıklandığında yapılacak işlemler
+                print("${product['name']} seçildi");
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.green[100], // Ürün kutu rengi
+                  borderRadius: BorderRadius.circular(10), // Köşe yuvarlama
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(2, 2),
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Ürün adı
+                      Text(
+                        product['name'],
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.green[700], // Yazı rengi
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // Ürün fiyatı (isteğe bağlı)
+                      if (product['price'] != null)
+                        Text(
+                          '\$${product['price']}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.green[500],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
 
 Future<void> loginUser(String kullaniciAdi, String sifre, BuildContext context) async {
   final url = Uri.parse("http://10.0.2.2/kullanici_api/login_user.php");
@@ -50,7 +156,7 @@ Future<void> loginUser(String kullaniciAdi, String sifre, BuildContext context) 
       print("Giriş başarılı: ${responseData["message"]}");
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => UsersProducts()),
       );
     } else {
       print("Hata: ${responseData["message"]}");
@@ -577,91 +683,70 @@ class LoginScreen extends StatelessWidget {
 }
 
 
-class RegisterScreen extends StatelessWidget {
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController isimController = TextEditingController();
+  TextEditingController soyisimController = TextEditingController();
+  TextEditingController kullaniciAdiController = TextEditingController();
+  TextEditingController sifreController = TextEditingController();
+  TextEditingController telefonController = TextEditingController();
+
+  Future<void> registerUser() async {
+    String apiUrl = "http://172.18.19.63/kullanici_api/register_user.php"; // Bilgisayar IP adresi
+
+    Map<String, String> userData = {
+      "isim": isimController.text,
+      "soyisim": soyisimController.text,
+      "kullanici_adi": kullaniciAdiController.text,
+      "sifre": sifreController.text,
+      "telefon": telefonController.text,
+    };
+
+    var response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(userData),
+    );
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      if (jsonResponse["success"]) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Kayıt başarılı!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Hata: ${jsonResponse["message"]}")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Bağlantı hatası!")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Üye Ol"),
-      ),
+      appBar: AppBar(title: Text("Üye Ol")),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "İsim/Soyisim",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: fullNameController,
-              decoration: InputDecoration(
-                hintText: 'İsminizi ve soyisminizi giriniz',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.all(10),
-              ),
-            ),
+            TextField(controller: isimController, decoration: InputDecoration(labelText: "İsim")),
+            TextField(controller: soyisimController, decoration: InputDecoration(labelText: "Soyisim")),
+            TextField(controller: kullaniciAdiController, decoration: InputDecoration(labelText: "Kullanıcı Adı")),
+            TextField(controller: sifreController, decoration: InputDecoration(labelText: "Şifre"), obscureText: true),
+            TextField(controller: telefonController, decoration: InputDecoration(labelText: "Telefon")),
             SizedBox(height: 20),
-
-            Text(
-              "Telefon Numarası",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: phoneController, // Telefon numarası için bir controller eklemeniz gerekecek
-              decoration: InputDecoration(
-                hintText: 'Telefon Numaranızı Girin',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.all(10),
-              ),
-            ),
-
-
-            Text(
-              "Kullanıcı Adı",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                hintText: 'Kullanıcı Adınızı Girin',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.all(10),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Şifre",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Şifrenizi Girin',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.all(10),
-              ),
-            ),
-            SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () {
-                // Buraya üye kaydı işlemi yapılacak kodu ekleyebilirsiniz.
-                print("Üye Kaydı Yapılıyor...");
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 15),
-              ),
-              child: Text(
-                'Üye Ol',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
+              onPressed: registerUser,
+              child: Text("Üye Ol"),
             ),
           ],
         ),
