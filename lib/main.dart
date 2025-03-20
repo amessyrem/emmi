@@ -196,7 +196,7 @@ class HomeScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 7, horizontal: 20),
               ),
               child: Text(
-                'Satıcı Girişi',
+                'Üretici Girişi',
                 style: TextStyle(fontSize: 30, color: Colors.white),
               ),
             ),
