@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'detail_screen.dart';
 import 'login_screen.dart';
+import 'categories/legumes_screen.dart';
+import 'categories/hayvansal_screen.dart';
+import 'categories/nuts_screen.dart';
+import 'categories/fruits_screen.dart';
+import 'categories/vegetables_screen.dart';
+import 'categories/all_products_screen.dart';
+
 
 class HomeScreen extends StatelessWidget {
   final List<String> boxNames = [
@@ -43,12 +50,33 @@ class HomeScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
+                      Widget targetScreen;
+                      switch (index) {
+                        case 0:
+                          targetScreen = const LegumesScreen();
+                          break;
+                        case 1:
+                          targetScreen = const MeatScreen();
+                          break;
+                        case 2:
+                          targetScreen = const NutsScreen();
+                          break;
+                        case 3:
+                          targetScreen = const FruitScreen();
+                          break;
+                        case 4:
+                          targetScreen = const VegetablesScreen();
+                          break;
+                        case 5:
+                          targetScreen = const AllProductsScreen();
+                          break;
+                        default:
+                          targetScreen =  DetailScreen(index: 0, name: 'Bilinmeyen');
+                      }
+
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DetailScreen(index: index + 1, name: boxNames[index]),
-                        ),
+                        MaterialPageRoute(builder: (context) => targetScreen),
                       );
                     },
                     child: Container(
