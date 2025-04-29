@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';  // Lottie paketini import ettik
 import 'home_screen.dart';
-
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,12 +17,8 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    )..repeat();
-
-    Future.delayed(const Duration(seconds: 4), () {
+    // 3 saniye sonra ana sayfaya geçiş yapıyoruz
+    Future.delayed(const Duration(seconds: 7), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -45,13 +40,11 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RotationTransition(
-              turns: _controller,
-              child: Icon(Icons.shopping_basket, size: 100, color: Colors.green),
-            ),
+
+            Lottie.asset('assets/animations/sepetli_dayi.json', width: 400, height: 400),  // BURDA ANİMASYONLARI SONRA SEÇERSİN
             const SizedBox(height: 20),
             const Text(
-              'eMMi Uygulaması',
+              'eMMi',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],
