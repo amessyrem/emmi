@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'register_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -40,8 +43,8 @@ class LoginScreen extends StatelessWidget {
                   //focusNode: usernameFocusNode, // FocusNode ekliyoruz
 
                   decoration: InputDecoration(
-                    labelText: "Kullanıcı Adı",
-                    hintText: "Kullanıcı adınızı girin",
+                    labelText: "E-mail",
+                    hintText: "E-mail girin",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15), // Oval köşe için
                     ),
@@ -69,28 +72,41 @@ class LoginScreen extends StatelessWidget {
 
                 // Giriş yap butonu
                 ElevatedButton(
-                  onPressed: () {
-                    final username = usernameController.text;
+                  onPressed: () async {
+                    final username = usernameController.text.trim();
                     final password = passwordController.text;
 
                     if (username.isEmpty || password.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Lütfen tüm alanları doldurun!")),
                       );
-                    } else if (username == "admin" && password == "1234") {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Giriş başarılı!")),
+                      return;
+                    }
+
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: username,
+                        password: password,
                       );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Hatalı kullanıcı adı veya şifre!")),
+
+                      // Başarılı giriş → yönlendirme yapılır
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()), // Ana sayfana yönlendir
                       );
+                    } on FirebaseAuthException catch (e) {
+                      String message = "Bir hata oluştu.";
+                      if (e.code == 'user-not-found') {
+                        message = "Kullanıcı bulunamadı.";
+                      } else if (e.code == 'wrong-password') {
+                        message = "Hatalı şifre.";
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
                     }
                   },
                   child: Text("Giriş Yap"),
-                  style:
-                  ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Buton genişliğini artırmak için
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
                     foregroundColor: Colors.black87,
                     backgroundColor: Color(0x846FAF37),
                     shape: RoundedRectangleBorder(
@@ -118,21 +134,6 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class RegisterScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Kayıt Ol"),
-        backgroundColor: Color(0x846FAF37),
-      ),
-      body: Center(
-        child: Text("Kayıt Olma Sayfası"),
       ),
     );
   }
