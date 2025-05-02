@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     // 3 saniye sonra ana sayfaya geçiş yapıyoruz
-    Future.delayed(const Duration(seconds: 7), () {
+    Future.delayed(const Duration(seconds: 6), () {//7 saniye çoksa sonra ayarla
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),

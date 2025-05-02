@@ -90,8 +90,8 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Image.asset(
                             boxImages[index],
-                            width : 80,
-                            height: 80,
+                            width : 100,
+                            height: 100,
                             fit: BoxFit.contain,
                           ),
                           SizedBox(height: 20),
