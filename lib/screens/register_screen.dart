@@ -42,10 +42,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(title: Text("Kayıt Ol"), backgroundColor: Color(0x846FAF37)),
       backgroundColor: Color(0xFFFAF7AC),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 4),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            SizedBox(height: 140),//daha sonra değiştiririz
+            Image.asset(
+              'assets/images/fertilizer.png',  // Burada resmin dosya yolu
+              width: 200, // Resmin genişliği
+              height: 200, // Resmin yüksekliği
+            ),
+            SizedBox(height: 30), // Resim ile kullanıcı adı arasındaki boşluk
+
+
+
             TextField(
               controller: emailController,
               decoration: InputDecoration(
