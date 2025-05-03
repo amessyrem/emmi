@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
+import 'producer_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -92,7 +93,7 @@ class LoginScreen extends StatelessWidget {
                       // Başarılı giriş → yönlendirme yapılır
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()), // Ana sayfana yönlendir
+                        MaterialPageRoute(builder: (context) => ProducerScreen()), // Ana sayfana yönlendir
                       );
                     } on FirebaseAuthException catch (e) {
                       String message = "Bir hata oluştu.";
