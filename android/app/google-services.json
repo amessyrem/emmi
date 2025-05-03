@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970534731512",
+    "project_id": "emmi-eb98a",
+    "storage_bucket": "emmi-eb98a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970534731512:android:104635e11aa0aed28b450d",
+        "android_client_info": {
+          "package_name": "com.example.emmi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_fm-7leX63zgr5FjzJVDDjflT9trElKM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
