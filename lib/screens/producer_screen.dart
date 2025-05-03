@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 //import 'ilan_ekle_screen.dart'; // Yeni ilan ekranı
 //import 'ilanlarim_screen.dart'; // Kullanıcının ilanları listelenecek
 import 'home_screen.dart';
+import 'products_screen.dart';
+import 'new_products_screen.dart';
 
 
 class ProducerScreen extends StatelessWidget {
@@ -53,7 +55,7 @@ class ProducerScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                          MaterialPageRoute(builder: (context) => MyProductsScreen()),
                         );
                       },
                     ),
@@ -68,7 +70,7 @@ class ProducerScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                          MaterialPageRoute(builder: (context) => NewListingScreen()),
                         );
                       },
                     ),
