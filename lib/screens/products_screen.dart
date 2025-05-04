@@ -52,7 +52,40 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                   leading: Icon(Icons.local_offer, color: Color(0x846FAF37)),
                   title: Text(ilan['kategori'] ?? 'Kategori Yok'),
                   subtitle: Text(ilan['aciklama'] ?? 'Açıklama yok'),
+                  trailing: Tooltip(
+                    message: 'Ürün duyurusunu kaldır',
+                    child: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Ürünü sil'),
+                            content: Text('Bu ürünü silmek istediğinize emin misiniz?'),
+                            actions: [
+                              TextButton(
+                                child: Text('İptal'),
+                                onPressed: () => Navigator.pop(context, false),
+                              ),
+                              TextButton(
+                                child: Text('Sil'),
+                                onPressed: () => Navigator.pop(context, true),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (shouldDelete == true) {
+                          await FirebaseFirestore.instance
+                              .collection('ilanlar')
+                              .doc(ilan.id)
+                              .delete();
+                        }
+                      },
+                    ),
+                  ),
                 ),
+
               );
             },
           );
