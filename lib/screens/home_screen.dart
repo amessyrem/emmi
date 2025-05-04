@@ -53,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                       Widget targetScreen;
                       switch (index) {
                         case 0:
-                          targetScreen = const LegumesScreen();
+                          targetScreen = const BakliyatEkrani();
                           break;
                         case 1:
                           targetScreen = const MeatScreen();
