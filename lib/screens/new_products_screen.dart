@@ -18,6 +18,9 @@ class _NewListingScreenState extends State<NewListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFAF7AC),
+
+
       appBar: AppBar(
         title: Text('Yeni Ürün'),
         backgroundColor: Color(0x846FAF37),
@@ -25,6 +28,7 @@ class _NewListingScreenState extends State<NewListingScreen> {
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
+
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Kategoriler', style: TextStyle(fontSize: 16)),

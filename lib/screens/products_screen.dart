@@ -13,6 +13,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFAF7AC),
       appBar: AppBar(
         title: Text("Ürünlerim"),
         backgroundColor: Color(0x846FAF37),
@@ -47,6 +48,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             itemBuilder: (context, index) {
               final ilan = docs[index];
               return Card(
+                color: Color(0x106FAF37),
                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: Icon(Icons.local_offer, color: Color(0x846FAF37)),
