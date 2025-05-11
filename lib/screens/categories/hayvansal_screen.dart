@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 class HayvansalUrunlerEkrani extends StatelessWidget {
   const HayvansalUrunlerEkrani({Key? key}) : super(key: key);
 
