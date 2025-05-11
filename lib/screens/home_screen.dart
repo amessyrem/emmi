@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
 
   final List<String> boxImages = [
     'assets/images/legumes.png',
-    'assets/images/cow.png',
+    'assets/images/coww.png',
     'assets/images/nuts.png',
     'assets/images/fruit.png',
     'assets/images/vegetables.png',
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                           targetScreen = const BakliyatEkrani();
                           break;
                         case 1:
-                          targetScreen = const MeatScreen();
+                          targetScreen = const HayvansalUrunlerEkrani();
                           break;
                         case 2:
                           targetScreen = const NutsScreen();
