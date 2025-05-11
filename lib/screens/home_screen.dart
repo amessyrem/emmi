@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                           targetScreen = const NutsScreen();
                           break;
                         case 3:
-                          targetScreen = const FruitScreen();
+                          targetScreen = const FruitsScreen();
                           break;
                         case 4:
                           targetScreen = const VegetablesScreen();
