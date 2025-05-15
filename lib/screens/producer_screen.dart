@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 import 'products_screen.dart';
 import 'new_products_screen.dart';
+import 'profile_screen.dart';
+
 
 
 class ProducerScreen extends StatelessWidget {
@@ -12,24 +14,17 @@ class ProducerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Üretici Paneli"),
-        backgroundColor: Color(0x846FAF37),
+        title: const Text("Üretici Paneli"),
+        backgroundColor: Colors.lightGreen,
         actions: [
-          GestureDetector(
-            onTap: () {
-              // Profil sayfasına yönlendirme ya da kullanıcı çıkışı gibi işlemler yapılabilir
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Profil tıklandı")),
+          IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilEkrani()),
               );
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Image.asset(
-                'assets/images/emmim.png', // Profil simgesi PNG dosyasının yolu
-                width: 32,
-                height: 32,
-              ),
-            ),
           ),
         ],
       ),
@@ -46,8 +41,14 @@ class ProducerScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min, // Fazla boşluk kaplamasın
                   children: [
                     ElevatedButton.icon(
-                      icon: Icon(Icons.list),
-                      label: Text("İlanlarım"),
+                      icon: Icon(Icons.list , size:30 , color:Colors.black, ),
+                      label: Text(
+                        "İlanlarım",
+                        style: TextStyle(
+                          fontSize: 27, // yazı boyutu
+                          color:Colors.black,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 60),
                         backgroundColor: Color(0x846FAF37),
@@ -59,10 +60,12 @@ class ProducerScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 35),
                     ElevatedButton.icon(
-                      icon: Icon(Icons.add),
-                      label: Text("Yeni İlan Ekle"),
+                      icon: Icon(Icons.add , size:30 , color:Colors.black,),
+                      label: Text("Yeni İlan Ekle" , style: TextStyle(
+                        fontSize: 24, color:Colors.black,// yazı boyutu
+                      ),),
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 60),
                         backgroundColor: Color(0x846FAF37),
