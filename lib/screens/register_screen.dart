@@ -29,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Firestore'a kullanıcıyı ekle
       await FirebaseFirestore.instance.collection('kullanicilar').doc(user!.uid).set({
         'email': user.email,
+        'sifre': passwordController.text.trim(),
         'isim': nameController.text.trim(),
         'soyisim': surnameController.text.trim(),
         'kayitTarihi': FieldValue.serverTimestamp(),
@@ -54,8 +55,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Kayıt Ol"), backgroundColor: Color(0x846FAF37)),
-      backgroundColor: Color(0xFFFAF7AC),
+      appBar: AppBar(title: Text("Kayıt Ol" ,
+        style: TextStyle(color: Color(0xFFFFFFFF)),),
+          backgroundColor: Color(0xFF0D5944)),
+      backgroundColor: Color(0xFFF1E7E4),
       body: SingleChildScrollView( // Taşmaları önlemek için
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -75,6 +78,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText: "İsim",
+                  fillColor: Color(0xCDF7FFDD),
+                  filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -85,6 +90,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: surnameController,
                 decoration: InputDecoration(
                   labelText: "Soyisim",
+                  fillColor: Color(0xCDF7FFDD),
+                  filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -95,6 +102,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: "E-mail",
+                  fillColor: Color(0xCDF7FFDD),
+                  filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -106,6 +115,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Şifre",
+                  fillColor: Color(0xCDF7FFDD),
+                  filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
@@ -117,7 +128,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 onPressed: _registerUser,
                 child: Text("Kayıt Ol"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0x846FAF37),
+                  backgroundColor: Color(0xFF0D5944),
+                  foregroundColor: Color(0xFFFFFFFF), // Yazı rengi burada
                   minimumSize: Size(double.infinity, 50),
                 ),
               ),

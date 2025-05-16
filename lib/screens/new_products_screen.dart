@@ -18,12 +18,12 @@ class _NewListingScreenState extends State<NewListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFAF7AC),
+      backgroundColor: Color(0xFFF1E7E4),
 
 
       appBar: AppBar(
-        title: Text('Yeni Ürün'),
-        backgroundColor: Color(0x846FAF37),
+        title: Text('Yeni Ürün' , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -80,11 +80,13 @@ class _NewListingScreenState extends State<NewListingScreen> {
                     }
 
                     try {
+
                       await FirebaseFirestore.instance.collection('ilanlar').add({
-                        'userId': user?.uid,
+
+                        'userId': FirebaseAuth.instance.currentUser?.uid,
                         'kategori': category,
                         'aciklama': description,
-                        'createdAt': Timestamp.now(),
+                        'createdAt': FieldValue.serverTimestamp(),
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,9 +105,10 @@ class _NewListingScreenState extends State<NewListingScreen> {
                     }
                   },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0x846FAF37),
+                  backgroundColor: Color(0xFF0D5944),
                 ),
-                child: Text("Ürünü kaydet"),
+                child: Text("Ürünü kaydet" ,
+                  style: TextStyle(color: Colors.white)),
               ),
             ),
           ],

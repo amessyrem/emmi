@@ -8,21 +8,22 @@ class MyProductsScreen extends StatefulWidget {
 }
 
 class _MyProductsScreenState extends State<MyProductsScreen> {
-  final user = FirebaseAuth.instance.currentUser;
-
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser; // 👈 BURAYA TAŞINDI!
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ürünlerim"),
-        backgroundColor: Color(0x846FAF37),
+        title: Text("Ürünlerim" , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('ilanlar') // Küçük harf olmalı!
+            .collection('ilanlar')
             .where('userId', isEqualTo: user?.uid)
             .orderBy('createdAt', descending: true)
             .snapshots(),
+
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -33,6 +34,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           }
 
           final docs = snapshot.data?.docs;
+
           if (docs == null || docs.isEmpty) {
             return Center(
               child: Text(
@@ -41,6 +43,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               ),
             );
           }
+
 
           return ListView.builder(
             itemCount: docs.length,

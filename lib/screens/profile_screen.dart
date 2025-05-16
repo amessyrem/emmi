@@ -1,27 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProfilEkrani extends StatefulWidget {
+class ProfileScreen extends StatefulWidget {
   @override
-  _ProfilEkraniState createState() => _ProfilEkraniState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfilEkraniState extends State<ProfilEkrani> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController telefonController = TextEditingController();
+class _ProfileScreenState extends State<ProfileScreen> {
+  User? user = FirebaseAuth.instance.currentUser;
+  bool _isPasswordVisible = false;
 
-  String guncelEmail = '';
-  String guncelTelefon = '';
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserData() {
+    return FirebaseFirestore.instance
+        .collection('kullanicilar')
+        .doc(user!.uid)
+        .get();
+  }
 
-  void bilgileriKaydet() {
-    setState(() {
-      guncelEmail = emailController.text;
-      guncelTelefon = telefonController.text;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Bilgiler başarıyla güncellendi."),
-        duration: Duration(seconds: 2),
+  Widget buildInfoBox(String label, String value, {bool isPassword = false}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: "$label: ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                  TextSpan(
+                    text: isPassword && !_isPasswordVisible ? "********" : value,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isPassword)
+            IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                color: Colors.grey[600],
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+        ],
       ),
     );
   }
@@ -29,91 +80,48 @@ class _ProfilEkraniState extends State<ProfilEkrani> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[100],
       appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: const Text("Profilim"),
-        leading: const BackButton(color: Colors.black),
+        title: Text("Profilim" , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-        child: Column(
-          children: [
-            // Profil fotoğrafı
-            Center(
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage: AssetImage("assets/images/farmer2.png"),
-              ),
-            ),
-            const SizedBox(height: 16),
+      backgroundColor: Color(0xFFF1E7E4),
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: getUserData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return Center(child: CircularProgressIndicator());
 
-            // Ad Soyad
-            Center(
-              child: Text(
-                "Ad Soyad",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
+          if (snapshot.hasError)
+            return Center(child: Text("Bir hata oluştu."));
 
-            // E-posta giriş alanı
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: "E-posta",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
+          if (!snapshot.hasData || !snapshot.data!.exists)
+            return Center(child: Text("Kullanıcı verisi bulunamadı."));
 
-            // Telefon giriş alanı
-            TextField(
-              controller: telefonController,
-              decoration: InputDecoration(
-                labelText: "Telefon",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 30),
+          var userData = snapshot.data!.data()!;
 
-            // Kaydet butonu
-            ElevatedButton.icon(
-              onPressed: bilgileriKaydet,
-              icon: Icon(Icons.save),
-              label: Text("Kaydet"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Güncel bilgiler gösterimi
-            if (guncelEmail.isNotEmpty || guncelTelefon.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Kaydedilen Bilgiler:",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Color(0xFF0D5944),
+                  child: Icon(
+                    Icons.person,
+                    size: 80,
+                    color: Colors.white,
                   ),
-                  SizedBox(height: 8),
-                  Text("E-posta: $guncelEmail"),
-                  Text("Telefon: $guncelTelefon"),
-                ],
-              ),
-          ],
-        ),
+                ),
+                SizedBox(height: 24),
+                buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
+                buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
+                buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
+                buildInfoBox("Şifre", userData['sifre'] ?? "********", isPassword: true),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 }
-

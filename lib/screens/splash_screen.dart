@@ -35,17 +35,17 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFAF7AC),
+      backgroundColor: Color(0xFFF1E7E4),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-            Lottie.asset('assets/animations/sepetli_dayi.json', width: 400, height: 400),  // BURDA ANİMASYONLARI SONRA SEÇERSİN
-            const SizedBox(height: 20),
+            Lottie.asset('assets/animations/sepetli_dayi.json', width: 800, height: 800),  // BURDA ANİMASYONLARI SONRA SEÇERSİN
+            const SizedBox(height: 1),
             const Text(
               'eMMi',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
           ],
         ),

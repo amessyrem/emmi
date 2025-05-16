@@ -16,10 +16,10 @@ class HayvansalUrunlerEkrani extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Hayvansal Ürünler"),
-        backgroundColor: Colors.lightGreen, // Aynı yeşil tonu
+        title: const Text("Hayvansal Ürünler" , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944), // Aynı yeşil tonu
       ),
-      backgroundColor: const Color(0xFFFAF7AC), // Aynı arka plan rengi
+      backgroundColor: const Color(0xFFF1E7E4), // Aynı arka plan rengi
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: GridView.count(

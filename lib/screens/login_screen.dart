@@ -14,10 +14,10 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       //resizeToAvoidBottomInset: true,//bunu da kalvye için keledik
       appBar: AppBar(
-        title: Text("Kullanıcı Girişi"),
-        backgroundColor: Color(0x846FAF37),
+        title: Text("Kullanıcı Girişi" , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
-      backgroundColor: Color(0xFFFAF7AC), // BEYAZ DI DEGİSTİRDİM BİDAHA BAKARSIN
+      backgroundColor: Color(0xFFF1E7E4), // BEYAZ DI DEGİSTİRDİM BİDAHA BAKARSIN
 
       body: SafeArea(//safe area ekledik klavye için
         child:SingleChildScrollView(
@@ -44,6 +44,8 @@ class LoginScreen extends StatelessWidget {
                   //focusNode: usernameFocusNode, // FocusNode ekliyoruz
 
                   decoration: InputDecoration(
+                    fillColor: Color(0xCDF7FFDD),
+                    filled: true,
                     labelText: "E-mail",
                     hintText: "E-mail girin",
                     border: OutlineInputBorder(
@@ -60,6 +62,8 @@ class LoginScreen extends StatelessWidget {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
+                    fillColor: Color(0xCDF7FFDD),
+                    filled: true,
                     labelText: "Şifre",
                     hintText: "Şifrenizi girin",
                     border: OutlineInputBorder(
@@ -108,8 +112,8 @@ class LoginScreen extends StatelessWidget {
                   child: Text("Giriş Yap"),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 50),
-                    foregroundColor: Colors.black87,
-                    backgroundColor: Color(0x846FAF37),
+                    foregroundColor: Colors.white,
+                    backgroundColor: Color(0xFF0D5944),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

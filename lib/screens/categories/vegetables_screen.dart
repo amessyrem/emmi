@@ -16,10 +16,10 @@ class VegetablesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sebze Ürünleri"),
-        backgroundColor: Colors.lightGreen,
+        title: const Text("Sebze Ürünleri" , style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
-      backgroundColor: const Color(0xFFFAF7AC),
+      backgroundColor: const Color(0xFFF1E7E4),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: GridView.count(

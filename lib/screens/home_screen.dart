@@ -32,8 +32,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('eMMi'), backgroundColor: Color(0x846FAF37)),
-      backgroundColor: Color(0xFFFAF7AC),
+      appBar: AppBar(title: Text('eMMi' , style: TextStyle(color: Colors.white)), backgroundColor: Color(0xFF0D5944)),
+      backgroundColor: Color(0xFFF1E7E4),
       body: Column(
         children: [
           Expanded(
@@ -114,11 +114,11 @@ class HomeScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-            icon: Icon(Icons.login,color: Colors.black,),
+            icon: Icon(Icons.login,color: Colors.white,),
             label: Text("Üretici Girişi"),
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: Color(0x846FAF37),
+              foregroundColor: Colors.white,
+              backgroundColor: Color(0xFF0D5944),
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             ),
           ),
