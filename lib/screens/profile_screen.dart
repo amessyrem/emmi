@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
                 buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
                 buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
-                buildInfoBox("Şifre", userData['sifre'] ?? "********", isPassword: true),
+                buildInfoBox("Şifre", userData.containsKey('sifre') ? userData['sifre'] : "********", isPassword: true),
               ],
             ),
           );
