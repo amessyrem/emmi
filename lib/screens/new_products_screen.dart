@@ -9,33 +9,35 @@ class NewListingScreen extends StatefulWidget {
 
 class _NewListingScreenState extends State<NewListingScreen> {
   String? selectedCategory;
+  String? selectedSubcategory;
   final descriptionController = TextEditingController();
 
-  final List<String> categories = [
-    'Bakliyat', 'Hayvansal Ürünler', 'Kuruyemiş', 'Meyve', 'Sebze', 'Tüm Ürünler',
-  ];
+  final Map<String, List<String>> categoryMap = {
+    'Bakliyat': ['nohut', 'mercimek', 'fasulye', 'barbunya', 'bezelye', 'mısır'],
+    'Hayvansal Ürünler': ['süt', 'yoğurt', 'bal', 'peynir', 'yağ', 'yumurta'],
+    'Kuruyemiş': ['ay çekirdeği', 'ceviz', 'fındık', 'leblebi', 'yer fıstığı', 'badem'],
+    'Meyve': ['elma', 'armut', 'portakal', 'kayısı', 'şeftali', 'çilek'],
+    'Sebze': ['patates', 'domates', 'patlıcan', 'salatalık', 'ıspanak', 'biber'],
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF1E7E4),
-
-
       appBar: AppBar(
-        title: Text('Yeni Ürün' , style: TextStyle(color: Colors.white)),
+        title: Text('Yeni Ürün', style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF0D5944),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
-
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Kategoriler', style: TextStyle(fontSize: 16)),
+            Text('Kategori Seç', style: TextStyle(fontSize: 16)),
             SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: selectedCategory,
-              items: categories.map((category) {
+              items: categoryMap.keys.map((category) {
                 return DropdownMenuItem(
                   value: category,
                   child: Text(category),
@@ -48,9 +50,33 @@ class _NewListingScreenState extends State<NewListingScreen> {
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
+                  selectedSubcategory = null;
                 });
               },
             ),
+            if (selectedCategory != null) ...[
+              SizedBox(height: 16),
+              Text('Alt Kategori Seç', style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: selectedSubcategory,
+                items: categoryMap[selectedCategory!]!.map((subcategory) {
+                  return DropdownMenuItem(
+                    value: subcategory,
+                    child: Text(subcategory),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Alt kategori seç',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    selectedSubcategory = value;
+                  });
+                },
+              ),
+            ],
             SizedBox(height: 24),
             Text('Açıklama', style: TextStyle(fontSize: 16)),
             SizedBox(height: 8),
@@ -67,48 +93,46 @@ class _NewListingScreenState extends State<NewListingScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                  onPressed: () async {
-                    final category = selectedCategory;
-                    final description = descriptionController.text;
-                    final user = FirebaseAuth.instance.currentUser;
+                onPressed: () async {
+                  final category = selectedCategory;
+                  final subcategory = selectedSubcategory;
+                  final description = descriptionController.text;
 
-                    if (category == null || description.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Lütfen tüm boşlukları doldurunuz.")),
-                      );
-                      return;
-                    }
+                  if (category == null || subcategory == null || description.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Lütfen tüm alanları doldurunuz.")),
+                    );
+                    return;
+                  }
 
-                    try {
+                  try {
+                    await FirebaseFirestore.instance.collection('ilanlar').add({
+                      'userId': FirebaseAuth.instance.currentUser?.uid,
+                      'kategori': category,
+                      'altKategori': subcategory,
+                      'aciklama': description,
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
 
-                      await FirebaseFirestore.instance.collection('ilanlar').add({
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Ürün başarıyla kaydedildi.")),
+                    );
 
-                        'userId': FirebaseAuth.instance.currentUser?.uid,
-                        'kategori': category,
-                        'aciklama': description,
-                        'createdAt': FieldValue.serverTimestamp(),
-                      });
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Ürün başarıyla kaydedildi.")),
-                      );
-
-                      // Formu sıfırla
-                      setState(() {
-                        selectedCategory = null;
-                        descriptionController.clear();
-                      });
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Hata oluştu: $e")),
-                      );
-                    }
-                  },
+                    setState(() {
+                      selectedCategory = null;
+                      selectedSubcategory = null;
+                      descriptionController.clear();
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Hata oluştu: $e")),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF0D5944),
                 ),
-                child: Text("Ürünü kaydet" ,
-                  style: TextStyle(color: Colors.white)),
+                child: Text("Ürünü kaydet", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],

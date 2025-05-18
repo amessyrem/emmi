@@ -8,91 +8,151 @@ class MyProductsScreen extends StatefulWidget {
 }
 
 class _MyProductsScreenState extends State<MyProductsScreen> {
+  final user = FirebaseAuth.instance.currentUser;
+  String? selectedCategory;
+
+  final List<String> categories = [
+    'Bakliyat', 'Hayvansal Ürünler', 'Kuruyemiş', 'Meyve', 'Sebze'
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser; // 👈 BURAYA TAŞINDI!
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ürünlerim" , style: TextStyle(color: Colors.white)),
+        title: Text("Ürünlerim", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF0D5944),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('ilanlar')
-            .where('userId', isEqualTo: user?.uid)
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
-
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text("Bir hata meydana geldi."));
-          }
-
-          final docs = snapshot.data?.docs;
-
-          if (docs == null || docs.isEmpty) {
-            return Center(
-              child: Text(
-                "Henüz bir ilanınız yok.",
-                style: TextStyle(fontSize: 18),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Kategori seçimi
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: DropdownButtonFormField<String>(
+              value: selectedCategory,
+              items: categories.map((category) {
+                return DropdownMenuItem(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Kategori seç',
               ),
-            );
-          }
+              onChanged: (value) {
+                setState(() {
+                  selectedCategory = value;
+                });
+              },
+            ),
+          ),
 
+          if (selectedCategory == null)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text("Bir kategori seçiniz.", style: TextStyle(fontSize: 16)),
+            )
+          else
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('ilanlar')
+                    .where('userId', isEqualTo: user?.uid)
+                    .where('kategori', isEqualTo: selectedCategory)
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-          return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final ilan = docs[index];
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: Icon(Icons.local_offer, color: Color(0x846FAF37)),
-                  title: Text(ilan['kategori'] ?? 'Kategori Yok'),
-                  subtitle: Text(ilan['aciklama'] ?? 'Açıklama yok'),
-                  trailing: Tooltip(
-                    message: 'Ürün duyurusunu kaldır',
-                    child: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        final shouldDelete = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text('Ürünü sil'),
-                            content: Text('Bu ürünü silmek istediğinize emin misiniz?'),
-                            actions: [
-                              TextButton(
-                                child: Text('İptal'),
-                                onPressed: () => Navigator.pop(context, false),
+                  if (snapshot.hasError) {
+                    print("Hata Detayı: ${snapshot.error}");
+                    return Center(
+                        child: Text("Hata: ${snapshot.error}"),);
+                  }
+
+                  final docs = snapshot.data?.docs;
+
+                  if (docs == null || docs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Bu kategoride ilanınız yok.",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      final ilan = docs[index];
+                      final altKategori = ilan['altKategori'] ?? 'Alt kategori yok';
+                      final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
+
+                      return Card(
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 4,
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$altKategori',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Color(0xFF0D5944),
+                                ),
                               ),
-                              TextButton(
-                                child: Text('Sil'),
-                                onPressed: () => Navigator.pop(context, true),
-                              ),
+                              SizedBox(height: 8),
+                              Text(aciklama),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  tooltip: 'İlanı sil',
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: Text('İlanı Sil'),
+                                        content: Text('Bu ilanı silmek istiyor musunuz?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, false),
+                                            child: Text('İptal'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, true),
+                                            child: Text('Sil'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    if (confirm == true) {
+                                      await FirebaseFirestore.instance
+                                          .collection('ilanlar')
+                                          .doc(ilan.id)
+                                          .delete();
+                                    }
+                                  },
+                                ),
+                              )
                             ],
                           ),
-                        );
-
-                        if (shouldDelete == true) {
-                          await FirebaseFirestore.instance
-                              .collection('ilanlar')
-                              .doc(ilan.id)
-                              .delete();
-                        }
-                      },
-                    ),
-                  ),
-                ),
-
-              );
-            },
-          );
-        },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            )
+        ],
       ),
     );
   }
