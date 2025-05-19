@@ -67,6 +67,7 @@ class AltKategoriSahipleriEkrani extends StatelessWidget {
                   final user = userSnapshot.data!;
                   final isim = user['isim'];
                   final soyisim = user['soyisim'];
+                  final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
 
                   return ListTile(
                     leading: Icon(Icons.eco, color: Colors.green, size: 28),
@@ -76,6 +77,13 @@ class AltKategoriSahipleriEkrani extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: Colors.black87,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "AÇIKLAMA: $aciklama",
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.grey[700],
                       ),
                     ),
 
