@@ -16,6 +16,10 @@ class SebzeSahipleriEkrani extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ispanak için özel karakter düzeltmesi
+    final duzeltilmisAltKategori =
+    altKategori == "Ispanak" ? "ıspanak" : altKategori.toLowerCase();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -28,7 +32,7 @@ class SebzeSahipleriEkrani extends StatelessWidget {
         stream: FirebaseFirestore.instance
             .collection('ilanlar')
             .where('kategori', isEqualTo: "Sebze")
-            .where('altKategori', isEqualTo: altKategori.toLowerCase())
+            .where('altKategori', isEqualTo: duzeltilmisAltKategori)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

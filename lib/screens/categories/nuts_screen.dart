@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Kuruyemiş ilan sahiplerini listeleyen ekran
 class KuruyemisSahipleriEkrani extends StatelessWidget {
   final String altKategori;
 
