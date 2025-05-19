@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'AltKategoriSahipleriEkrani.dart';
 
 class HayvansalUrunlerEkrani extends StatelessWidget {
   const HayvansalUrunlerEkrani({Key? key}) : super(key: key);
@@ -16,10 +18,10 @@ class HayvansalUrunlerEkrani extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Hayvansal Ürünler" , style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF0D5944), // Aynı yeşil tonu
+        title: const Text("Hayvansal Ürünler", style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF0D5944),
       ),
-      backgroundColor: const Color(0xFFF1E7E4), // Aynı arka plan rengi
+      backgroundColor: const Color(0xFFF1E7E4),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: GridView.count(
@@ -27,28 +29,38 @@ class HayvansalUrunlerEkrani extends StatelessWidget {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           children: hayvansalUrunler.map((urun) {
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0x106FAF37), // Aynı kutu rengi
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    urun["resim"]!,
-                    height: 100,
-                    fit: BoxFit.contain,
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AltKategoriSahipleriEkrani(altKategori: urun["isim"]!),
                   ),
-                  const SizedBox(height: 50),
-                  Text(
-                    urun["isim"]!,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0x106FAF37),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      urun["resim"]!,
+                      height: 100,
+                      fit: BoxFit.contain,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 50),
+                    Text(
+                      urun["isim"]!,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }).toList(),
