@@ -3,6 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
+  final VoidCallback onClose; // paneli kapatacak fonksiyon
+
+  const ProfileScreen({required this.onClose});
+
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -79,13 +83,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Profilim" , style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF0D5944),
-      ),
-      backgroundColor: Color(0xFFF1E7E4),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    return Container(
+      color: Color(0xFFD5EDD4),
+      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: getUserData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting)
@@ -100,23 +100,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
           var userData = snapshot.data!.data()!;
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Color(0xFF0D5944),
-                  child: Icon(
-                    Icons.person,
-                    size: 80,
-                    color: Colors.white,
+                // Üst başlık ve kapatma butonu
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  width: double.infinity,
+                  color: Color(0xFF0D5944),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Profilim',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: widget.onClose,
+                          child: Icon(Icons.close, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 24),
-                buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
-                buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
-                buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
-                buildInfoBox("Şifre", userData.containsKey('sifre') ? userData['sifre'] : "********", isPassword: true),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Color(0xFF0D5944),
+                        child: Icon(
+                          Icons.person,
+                          size: 80,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
+                      buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
+                      buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
+                      buildInfoBox("Şifre", userData.containsKey('sifre') ? userData['sifre'] : "********", isPassword: true),
+                    ],
+                  ),
+                ),
               ],
             ),
           );

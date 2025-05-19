@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'products_screen.dart';
 import 'new_products_screen.dart';
-import 'profile_screen.dart';  // ProfilePanel widget'ını ayrı dosyaya koyduysan böyle import et
+import 'profile_screen.dart';
 
 class ProducerScreen extends StatefulWidget {
   @override
@@ -54,7 +54,7 @@ class _ProducerScreenState extends State<ProducerScreen> with SingleTickerProvid
         backgroundColor: Color(0xFF0D5944),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle, color: Color(0xFFF1E7E4)),
+            icon: const Icon(Icons.account_circle, color: Color(0xFFFFFFFF)),
             onPressed: _toggleProfilePanel,
           ),
         ],
@@ -120,19 +120,15 @@ class _ProducerScreenState extends State<ProducerScreen> with SingleTickerProvid
                 alignment: Alignment.centerRight,
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.7,
-                  color: Colors.white,
+                  color: Color(0xFFF1E7E4),
                   child: Column(
                     children: [
                       // Kapatma butonu
                       Container(
-                        padding: EdgeInsets.only(top: 40, right: 8),
+                        padding: EdgeInsets.only(top: 2, right: 8),
                         alignment: Alignment.topRight,
-                        child: IconButton(
-                          icon: Icon(Icons.close, size: 28),
-                          onPressed: _toggleProfilePanel,
-                        ),
                       ),
-                      Expanded(child: ProfileScreen()),
+                      Expanded(child: ProfileScreen(onClose: _toggleProfilePanel)),
                     ],
                   ),
                 ),
