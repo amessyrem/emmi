@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'AltKategoriSahipleriEkrani.dart';
+import '../AltKategoriSahipleriEkrani.dart';
 
 class HayvansalUrunlerEkrani extends StatelessWidget {
   const HayvansalUrunlerEkrani({Key? key}) : super(key: key);

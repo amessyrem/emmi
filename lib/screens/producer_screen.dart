@@ -84,7 +84,7 @@ class _ProducerScreenState extends State<ProducerScreen> with SingleTickerProvid
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MyProductsScreen()),
+                          MaterialPageRoute(builder: (context) => ProductFilterScreen()),
                         );
                       },
                     ),

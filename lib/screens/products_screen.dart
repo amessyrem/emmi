@@ -1,158 +1,137 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'filtered_products_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class MyProductsScreen extends StatefulWidget {
+class ProductFilterScreen extends StatefulWidget {
   @override
-  _MyProductsScreenState createState() => _MyProductsScreenState();
+  _ProductFilterScreenState createState() => _ProductFilterScreenState();
 }
 
-class _MyProductsScreenState extends State<MyProductsScreen> {
-  final user = FirebaseAuth.instance.currentUser;
+class _ProductFilterScreenState extends State<ProductFilterScreen> {
   String? selectedCategory;
+  String? selectedSubcategory;
+  String? selectedCity;
+  String? selectedDistrict;
 
-  final List<String> categories = [
-    'Bakliyat', 'Hayvansal Ürünler', 'Kuruyemiş', 'Meyve', 'Sebze'
-  ];
+  final Map<String, List<String>> categoryMap = {
+    'Bakliyat': ['nohut', 'mercimek', 'fasulye', 'barbunya', 'bezelye', 'mısır'],
+    'Meyve': ['elma', 'armut', 'portakal', 'kayısı', 'şeftali', 'çilek'],
+    'Sebze': ['patates', 'domates', 'patlıcan', 'salatalık', 'ıspanak', 'biber'],
+    'Kuruyemiş': ['ay çekirdeği', 'ceviz', 'fındık', 'leblebi', 'yer fıstığı', 'badem'],
+    'Hayvansal Ürünler': ['süt', 'yoğurt', 'bal', 'peynir', 'yağ', 'yumurta'],
+  };
+
+  List<String> cities = [];
+  List<String> districts = [];
+  bool isLoadingCities = true;
+  bool isLoadingDistricts = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCities();
+  }
+
+  Future<void> loadCities() async {
+    final response = await http.get(Uri.parse("https://turkiyeapi.dev/api/v1/provinces"));
+    final decoded = json.decode(response.body);
+    setState(() {
+      cities = List<String>.from(decoded['data'].map((e) => e['name']));
+      isLoadingCities = false;
+    });
+  }
+
+  Future<void> loadDistricts(String cityName) async {
+    setState(() => isLoadingDistricts = true);
+
+    final response = await http.get(Uri.parse("https://turkiyeapi.dev/api/v1/provinces"));
+    final decoded = json.decode(response.body);
+    final selected = decoded['data'].firstWhere((il) => il['name'] == cityName);
+    setState(() {
+      districts = List<String>.from(selected['districts'].map((d) => d['name']));
+      isLoadingDistricts = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Ürünlerim", style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF0D5944),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Kategori seçimi
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: DropdownButtonFormField<String>(
+      appBar: AppBar(title: Text('Ürün Filtrele'), backgroundColor: Color(0xFF0D5944)),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            DropdownButtonFormField<String>(
               value: selectedCategory,
-              items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Kategori seç',
-              ),
+              items: categoryMap.keys
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
+                  selectedSubcategory = null;
                 });
               },
+              decoration: InputDecoration(labelText: 'Kategori'),
             ),
-          ),
-
-          if (selectedCategory == null)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text("Bir kategori seçiniz.", style: TextStyle(fontSize: 16)),
-            )
-          else
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('ilanlar')
-                    .where('userId', isEqualTo: user?.uid)
-                    .where('kategori', isEqualTo: selectedCategory)
-                    .orderBy('createdAt', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    print("Hata Detayı: ${snapshot.error}");
-                    return Center(
-                        child: Text("Hata: ${snapshot.error}"),);
-                  }
-
-                  final docs = snapshot.data?.docs;
-
-                  if (docs == null || docs.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "Bu kategoride ilanınız yok.",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      final ilan = docs[index];
-                      final altKategori = ilan['altKategori'] ?? 'Alt kategori yok';
-                      final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
-
-                      return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '$altKategori',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Color(0xFF0D5944),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(aciklama),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
-                                  tooltip: 'İlanı sil',
-                                  onPressed: () async {
-                                    final confirm = await showDialog<bool>(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                        title: Text('İlanı Sil'),
-                                        content: Text('Bu ilanı silmek istiyor musunuz?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(context, false),
-                                            child: Text('İptal'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(context, true),
-                                            child: Text('Sil'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-
-                                    if (confirm == true) {
-                                      await FirebaseFirestore.instance
-                                          .collection('ilanlar')
-                                          .doc(ilan.id)
-                                          .delete();
-                                    }
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+            if (selectedCategory != null)
+              DropdownButtonFormField<String>(
+                key: ValueKey(selectedCategory), // Bu, yeniden oluşturmayı garanti eder
+                value: selectedSubcategory,
+                items: categoryMap[selectedCategory!]!
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) => setState(() => selectedSubcategory = value),
+                decoration: InputDecoration(labelText: 'Alt Kategori'),
               ),
-            )
-        ],
+            SizedBox(height: 16),
+            isLoadingCities
+                ? CircularProgressIndicator()
+                : DropdownButtonFormField<String>(
+              value: selectedCity,
+              items: cities.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              onChanged: (value) async {
+                setState(() {
+                  selectedCity = value;
+                  selectedDistrict = null;
+                });
+                await loadDistricts(value!);
+              },
+              decoration: InputDecoration(labelText: 'İl'),
+            ),
+            if (selectedCity != null && !isLoadingDistricts)
+              DropdownButtonFormField<String>(
+                value: selectedDistrict,
+                items: districts.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                onChanged: (value) => setState(() => selectedDistrict = value),
+                decoration: InputDecoration(labelText: 'İlçe'),
+              ),
+            Spacer(),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF0D5944)),
+              onPressed: (selectedCategory != null &&
+                  selectedSubcategory != null &&
+                  selectedCity != null &&
+                  selectedDistrict != null)
+                  ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => FilteredProductsScreen(
+                      kategori: selectedCategory!,
+                      altKategori: selectedSubcategory!,
+                      il: selectedCity!,
+                      ilce: selectedDistrict!,
+                    ),
+                  ),
+                );
+              }
+                  : null,
+              child: Text('Ürünleri Listele', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }

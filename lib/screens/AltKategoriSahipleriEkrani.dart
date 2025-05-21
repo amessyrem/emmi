@@ -6,6 +6,8 @@ class AltKategoriSahipleriEkrani extends StatelessWidget {
 
   const AltKategoriSahipleriEkrani({Key? key, required this.altKategori}) : super(key: key);
 
+
+  // Kullanıcı bilgilerini getir
   Future<Map<String, dynamic>?> _getUserInfo(String userId) async {
     final userDoc = await FirebaseFirestore.instance.collection('kullanicilar').doc(userId).get();
     if (userDoc.exists) {
@@ -18,23 +20,21 @@ class AltKategoriSahipleriEkrani extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: Text(
-            "$altKategori İçin İlan Verenler",
+          "$altKategori İçin İlan Verenler",
           style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-          color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
           ),
         ),
-
         backgroundColor: Color(0xFF0D5944),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('ilanlar')
             .where('kategori', isEqualTo: "Hayvansal Ürünler")
-            .where('altKategori', isEqualTo: altKategori.toLowerCase())
+            .where('altKategori', isEqualTo: altKategori.toLowerCase()) // dikkat!
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,34 +61,28 @@ class AltKategoriSahipleriEkrani extends StatelessWidget {
                   }
 
                   if (!userSnapshot.hasData || userSnapshot.data == null) {
-                    return ListTile(title: Text("Kullanıcı bilgisi bulunamadı"));
+                    final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
+                    return ListTile(
+                      leading: Icon(Icons.eco, color: Colors.green),
+                      title: Text("İLAN SAHİBİ: null"),
+                      subtitle: Text("AÇIKLAMA: $aciklama"),
+                    );
                   }
 
                   final user = userSnapshot.data!;
-                  final isim = user['isim'];
-                  final soyisim = user['soyisim'];
+                  print("Kullanıcı verisi: $user");
+
+
+
+                  final isim = user['isim'] ?? 'Bilinmiyor';
+                  final soyisim = user['soyisim'] ?? '';
                   final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
 
                   return ListTile(
-                    leading: Icon(Icons.eco, color: Colors.green, size: 28),
-                    title: Text(
-                      "İLAN SAHİBİ: $isim $soyisim",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    subtitle: Text(
-                      "AÇIKLAMA: $aciklama",
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-
+                    leading: Icon(Icons.eco, color: Colors.green),
+                    title: Text("İLAN SAHİBİ: $isim $soyisim"),
+                    subtitle: Text("AÇIKLAMA: $aciklama"),
                   );
-
                 },
               );
             },
