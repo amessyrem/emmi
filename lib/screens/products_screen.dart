@@ -194,8 +194,50 @@ class _ProductFilterScreenState extends State<ProductFilterScreen> {
                     final ilan = ilanlar[index];
                     return ListTile(
                       title: Text(ilan['altKategori'] ?? ''),
-                      subtitle: Text("İl: ${ilan['il'] ?? '-'} - İlçe: ${ilan['ilce'] ?? '-'}"),
+                      subtitle: Text(
+                        "İl: ${ilan['il'] ?? '-'} - İlçe: ${ilan['ilce'] ?? '-'}\nFiyat: ${ilan['fiyat'] ?? '-'} ₺",
+                      ),
+                      isThreeLine: true, // Subtitle 2 satır olacağı için
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.black54),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text("İlanı silmek istediğinize emin misiniz?"),
+                              actions: [
+                                TextButton(
+                                  child: Text("İptal"),
+                                  onPressed: () => Navigator.pop(context, false),
+                                ),
+                                TextButton(
+                                  child: Text("Sil"),
+                                  onPressed: () => Navigator.pop(context, true),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection('ilanlar')
+                                  .doc(ilan.id)
+                                  .delete();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("İlan silindi.")),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("İlan silinirken hata oluştu.")),
+                              );
+                            }
+                          }
+                        },
+                      ),
                     );
+
                   },
                 );
               },
