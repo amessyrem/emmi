@@ -10,15 +10,14 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();     // İSİM
-  final TextEditingController surnameController = TextEditingController();  // SOYİSİM
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
 
   bool isLoading = false;
 
   Future<void> _registerUser() async {
     setState(() => isLoading = true);
     try {
-      // Firebase Auth ile kullanıcı oluştur
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text,
@@ -26,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       User? user = userCredential.user;
 
-      // Firestore'a kullanıcıyı ekle
       await FirebaseFirestore.instance.collection('kullanicilar').doc(user!.uid).set({
         'email': user.email,
         'sifre': passwordController.text.trim(),
@@ -38,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Kayıt başarılı!")),
       );
-      Navigator.pop(context); // Login ekranına dön
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       String message = "Bir hata oluştu.";
       if (e.code == 'email-already-in-use') {
@@ -55,87 +53,102 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Kayıt Ol" ,
-        style: TextStyle(color: Color(0xFFFFFFFF)),),
-          backgroundColor: Color(0xFF0D5944)),
-      backgroundColor: Color(0xFFF1E7E4),
-      body: SingleChildScrollView( // Taşmaları önlemek için
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: 40),
-              Image.asset(
-                'assets/images/farmer2.png',
-                width: 200,
-                height: 200,
-              ),
-              SizedBox(height: 40),
-
-              // İsim
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: "İsim",
-                  fillColor: Color(0xCDF7FFDD),
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              // Soyisim
-              TextField(
-                controller: surnameController,
-                decoration: InputDecoration(
-                  labelText: "Soyisim",
-                  fillColor: Color(0xCDF7FFDD),
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              // E-mail
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: "E-mail",
-                  fillColor: Color(0xCDF7FFDD),
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              SizedBox(height: 16),
-
-              // Şifre
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Şifre",
-                  fillColor: Color(0xCDF7FFDD),
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              SizedBox(height: 24),
-
-              isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _registerUser,
-                child: Text("Kayıt Ol"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0D5944),
-                  foregroundColor: Color(0xFFFFFFFF), // Yazı rengi burada
-                  minimumSize: Size(double.infinity, 50),
-                ),
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: Text(
+          "Kayıt Ol",
+          style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: Color(0xFF0D5944),
+      ),
+      backgroundColor: Color(0xFFF1E7E4),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/background.jpg',
+            fit: BoxFit.cover,
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 40),
+                  Image.asset(
+                    'assets/images/emmim.png',
+                    width: 200,
+                    height: 200,
+                  ),
+                  SizedBox(height: 40),
+
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: "İsim",
+                      fillColor: Color(0xCDF7FFDD),
+                      filled: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+
+                  TextField(
+                    controller: surnameController,
+                    decoration: InputDecoration(
+                      labelText: "Soyisim",
+                      fillColor: Color(0xCDF7FFDD),
+                      filled: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: "E-mail",
+                      fillColor: Color(0xCDF7FFDD),
+                      filled: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 16),
+
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Şifre",
+                      fillColor: Color(0xCDF7FFDD),
+                      filled: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    textInputAction: TextInputAction.done,
+                  ),
+                  SizedBox(height: 24),
+
+                  isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                    onPressed: _registerUser,
+                    child: Text("Kayıt Ol"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF0D5944),
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -54,7 +54,11 @@ class _ProducerScreenState extends State<ProducerScreen> with SingleTickerProvid
         backgroundColor: Color(0xFF0D5944),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle, color: Color(0xFFFFFFFF)),
+            icon: Image.asset(
+              'assets/images/emmim.png',
+              width: 30,
+              height: 30,
+            ),
             onPressed: _toggleProfilePanel,
           ),
         ],
