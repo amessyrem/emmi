@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'filtered_products_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductFilterScreen extends StatefulWidget {
   @override
@@ -54,84 +55,148 @@ class _ProductFilterScreenState extends State<ProductFilterScreen> {
     });
   }
 
+  Query buildQuery() {
+    Query query = FirebaseFirestore.instance.collection('ilanlar');
+
+    if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+      query = query.where('kategori', isEqualTo: selectedCategory!);
+    }
+
+    if (selectedSubcategory != null && selectedSubcategory!.isNotEmpty) {
+      query = query.where('altKategori', isEqualTo: selectedSubcategory!.toLowerCase());
+    }
+
+    if (selectedCity != null && selectedCity!.isNotEmpty) {
+      query = query.where('il', isEqualTo: selectedCity);
+    }
+
+    if (selectedDistrict != null && selectedDistrict!.isNotEmpty) {
+      query = query.where('ilce', isEqualTo: selectedDistrict);
+    }
+
+    return query;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ürün Filtrele'), backgroundColor: Color(0xFF0D5944)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            DropdownButtonFormField<String>(
-              value: selectedCategory,
-              items: categoryMap.keys
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value;
-                  selectedSubcategory = null;
-                });
-              },
-              decoration: InputDecoration(labelText: 'Kategori'),
-            ),
-            if (selectedCategory != null)
-              DropdownButtonFormField<String>(
-                key: ValueKey(selectedCategory), // Bu, yeniden oluşturmayı garanti eder
-                value: selectedSubcategory,
-                items: categoryMap[selectedCategory!]!
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (value) => setState(() => selectedSubcategory = value),
-                decoration: InputDecoration(labelText: 'Alt Kategori'),
-              ),
-            SizedBox(height: 16),
-            isLoadingCities
-                ? CircularProgressIndicator()
-                : DropdownButtonFormField<String>(
-              value: selectedCity,
-              items: cities.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              onChanged: (value) async {
-                setState(() {
-                  selectedCity = value;
-                  selectedDistrict = null;
-                });
-                await loadDistricts(value!);
-              },
-              decoration: InputDecoration(labelText: 'İl'),
-            ),
-            if (selectedCity != null && !isLoadingDistricts)
-              DropdownButtonFormField<String>(
-                value: selectedDistrict,
-                items: districts.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                onChanged: (value) => setState(() => selectedDistrict = value),
-                decoration: InputDecoration(labelText: 'İlçe'),
-              ),
-            Spacer(),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF0D5944)),
-              onPressed: (selectedCategory != null &&
-                  selectedSubcategory != null &&
-                  selectedCity != null &&
-                  selectedDistrict != null)
-                  ? () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FilteredProductsScreen(
-                      kategori: selectedCategory!,
-                      altKategori: selectedSubcategory!,
-                      il: selectedCity!,
-                      ilce: selectedDistrict!,
+      appBar: AppBar(title: Text('Ürünler'), backgroundColor: Color(0xFF0D5944)),
+      body: Column(
+        children: [
+          // Filtreler
+          Padding(
+            padding: EdgeInsets.all(12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedCategory,
+                        items: categoryMap.keys
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCategory = value;
+                            selectedSubcategory = null;
+                          });
+                        },
+                        decoration: InputDecoration(labelText: 'Kategori'),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 16), // Araya boşluk
+                    if (selectedCategory != null)
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          key: ValueKey(selectedCategory),
+                          value: selectedSubcategory,
+                          items: categoryMap[selectedCategory!]!
+                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedSubcategory = value;
+                            });
+                          },
+                          decoration: InputDecoration(labelText: 'Alt Kategori'),
+                        ),
+                      ),
+                  ],
+                ),
+
+                SizedBox(height: 10),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: isLoadingCities
+                          ? Center(child: CircularProgressIndicator())
+                          : DropdownButtonFormField<String>(
+                        value: selectedCity,
+                        items: cities
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (value) async {
+                          setState(() {
+                            selectedCity = value;
+                            selectedDistrict = null;
+                            districts = [];
+                          });
+                          if (value != null) await loadDistricts(value);
+                        },
+                        decoration: InputDecoration(labelText: 'İl'),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    if (selectedCity != null && !isLoadingDistricts)
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: selectedDistrict,
+                          items: districts
+                              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedDistrict = value;
+                            });
+                          },
+                          decoration: InputDecoration(labelText: 'İlçe'),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            )
+          ),
+
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: buildQuery().snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text("İlan bulunamadı."));
+                }
+
+                final ilanlar = snapshot.data!.docs;
+
+                return ListView.builder(
+                  itemCount: ilanlar.length,
+                  itemBuilder: (context, index) {
+                    final ilan = ilanlar[index];
+                    return ListTile(
+                      title: Text(ilan['altKategori'] ?? ''),
+                      subtitle: Text("İl: ${ilan['il'] ?? '-'} - İlçe: ${ilan['ilce'] ?? '-'}"),
+                    );
+                  },
                 );
-              }
-                  : null,
-              child: Text('Ürünleri Listele', style: TextStyle(color: Colors.white)),
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
