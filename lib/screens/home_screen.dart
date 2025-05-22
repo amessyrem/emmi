@@ -9,7 +9,6 @@ import 'categories/fruits_screen.dart';
 import 'categories/vegetables_screen.dart';
 import 'categories/all_products_screen.dart';
 
-
 class HomeScreen extends StatelessWidget {
   final List<String> boxNames = [
     'Bakliyat',
@@ -32,7 +31,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('eMMi' , style: TextStyle(color: Colors.white)), backgroundColor: Color(0xFF0D5944)),
+      appBar: AppBar(title: Image.asset(
+        'assets/images/emmilogo4.png',  // PNG dosyasının yolu
+        height: 100),
+          backgroundColor: Color(0xFF0D5944)),
       backgroundColor: Color(0xFFF1E7E4),
       body: Stack(
         children: [

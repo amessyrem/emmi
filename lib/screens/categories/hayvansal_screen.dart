@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+=======
+import 'AltKategoriSahipleriEkrani.dart';
+>>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
 
 class HayvansalUrunlerEkrani extends StatelessWidget {
   const HayvansalUrunlerEkrani({Key? key}) : super(key: key);
@@ -35,7 +39,12 @@ class HayvansalUrunlerEkrani extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+<<<<<<< HEAD
                     builder: (context) => HayvansalurunSahipleriEkrani(altKategori: urun["isim"]!),
+=======
+                    builder: (context) =>
+                        AltKategoriSahipleriEkrani(altKategori: urun["isim"]!),
+>>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
                   ),
                 );
               },

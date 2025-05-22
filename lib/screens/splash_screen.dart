@@ -40,15 +40,16 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
-            Lottie.asset('assets/animations/sepetli_dayi.json', width: 800, height: 800),  // BURDA ANİMASYONLARI SONRA SEÇERSİN
+            Lottie.asset('assets/animations/sepetli_dayi.json', width: 800, height: 800),
             const SizedBox(height: 1),
-            const Text(
-              'eMMi',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            Image.asset(
+              'assets/images/emmilogo1.png',  // PNG dosyanın yolu
+              width: 200,                      // İstediğin boyuta göre ayarlayabilirsin
+              height: 100,
             ),
           ],
         ),
+
       ),
     );
   }

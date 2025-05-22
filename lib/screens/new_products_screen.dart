@@ -232,22 +232,41 @@ class _NewListingScreenState extends State<NewListingScreen> {
                     return;
                   }
 
+<<<<<<< HEAD
                   double? price = double.tryParse(priceText);
                   if (price == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Lütfen geçerli bir fiyat giriniz.")),
+=======
+
+
+                  final currentUser = FirebaseAuth.instance.currentUser;
+
+                  if (currentUser == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Kullanıcı oturumu açık değil.")),
+>>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
                     );
                     return;
                   }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
                   try {
                     await FirebaseFirestore.instance.collection('ilanlar').add({
-                      'userId': FirebaseAuth.instance.currentUser?.uid,
+                      'userId': currentUser.uid,
                       'kategori': category,
+<<<<<<< HEAD
                       'altKategori': subcategory,
                       'il': city,
                       'ilce': district,
                       'fiyat': price,
+=======
+                      'altKategori': subcategory.toLowerCase(),
+>>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
                       'aciklama': description,
                       'createdAt': FieldValue.serverTimestamp(),
                     });
