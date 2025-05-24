@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
+
 class KuruyemisSahipleriEkrani extends StatefulWidget {
   final String altKategori;
   const KuruyemisSahipleriEkrani({Key? key, required this.altKategori}) : super(key: key);
@@ -66,26 +67,20 @@ class _KuruyemisSahipleriEkraniState extends State<KuruyemisSahipleriEkrani> {
             ilceler = List<String>.from(il['districts'].map((d) => d['name']));
             isLoadingIlceler = false;
           });
-        } else {
-          setState(() {
-            ilceler = [];
-            isLoadingIlceler = false;
-          });
         }
-      } else {
-        setState(() {
-          ilceler = [];
-          isLoadingIlceler = false;
-        });
-        debugPrint("İlçeler API hatası: ${response.statusCode}");
       }
     } catch (e) {
+      debugPrint("İlçeler çekme hatası: $e");
+    } finally {
       setState(() {
-        ilceler = [];
         isLoadingIlceler = false;
       });
-      debugPrint("İlçeler çekme hatası: $e");
     }
+  }
+
+  Future<Map<String, dynamic>?> _getUserInfo(String userId) async {
+    final userDoc = await FirebaseFirestore.instance.collection('kullanicilar').doc(userId).get();
+    return userDoc.exists ? userDoc.data() : null;
   }
 
   @override
@@ -105,154 +100,181 @@ class _KuruyemisSahipleriEkraniState extends State<KuruyemisSahipleriEkrani> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.altKategori} İçin İlan Verenler"),
-        backgroundColor: const Color(0xFF0D5944),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text("${widget.altKategori} İçin İlan Verenler", style: const TextStyle(color: Colors.black)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Column(
+      extendBodyBehindAppBar: true, // AppBar'ı gövde üstüne bindirir
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                // İl Dropdown
-                Expanded(
-                  child: isLoadingIller
-                      ? const Center(child: CircularProgressIndicator())
-                      : DropdownButton<String>(
-                    hint: const Text("İl Seçiniz"),
-                    value: selectedIl,
-                    isExpanded: true,
-                    items: [null, ...iller].map((il) {
-                      return DropdownMenuItem<String>(
-                        value: il,
-                        child: Text(il ?? "Tüm İller"),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedIl = value;
-                        selectedIlce = null;
-                        ilceler = [];
-                      });
-                      if (value != null) {
-                        _fetchIlceler(value);
-                      }
-                    },
-                  ),
-                ),
-
-                const SizedBox(width: 16), // Dropdownlar arasında boşluk
-
-                // İlçe Dropdown
-                Expanded(
-                  child: isLoadingIlceler
-                      ? const Center(child: CircularProgressIndicator())
-                      : DropdownButton<String>(
-                    hint: const Text("İlçe Seçiniz"),
-                    value: selectedIlce,
-                    isExpanded: true,
-                    items: [null, ...ilceler].map((ilce) {
-                      return DropdownMenuItem<String>(
-                        value: ilce,
-                        child: Text(ilce ?? "Tüm İlçeler"),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedIlce = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/background3.png',//background burda
+              fit: BoxFit.cover,
             ),
           ),
+          Column(
+            children: [
+              const SizedBox(height: kToolbarHeight+40),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: isLoadingIller
+                          ? const Center(child: CircularProgressIndicator())
+                          : DropdownButton<String>(
+                        hint: const Text("İl Seçiniz"),
+                        value: selectedIl,
+                        isExpanded: true,
+                        items: [null, ...iller].map((il) {
+                          return DropdownMenuItem<String>(
+                            value: il,
+                            child: Text(il ?? "Tüm İller"),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedIl = value;
+                            selectedIlce = null;
+                            ilceler = [];
+                          });
+                          if (value != null) {
+                            _fetchIlceler(value);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: isLoadingIlceler
+                          ? const Center(child: CircularProgressIndicator())
+                          : DropdownButton<String>(
+                        hint: const Text("İlçe Seçiniz"),
+                        value: selectedIlce,
+                        isExpanded: true,
+                        items: [null, ...ilceler].map((ilce) {
+                          return DropdownMenuItem<String>(
+                            value: ilce,
+                            child: Text(ilce ?? "Tüm İlçeler"),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedIlce = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: ilanQuery.snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(child: Text("Bu filtrelerle ilan bulunamadı."));
+                    }
+                    final ilanlar = snapshot.data!.docs;
 
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: ilanQuery.snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text("Bu filtrelerle ilan bulunamadı."));
-                }
-                final ilanlar = snapshot.data!.docs;
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: ilanlar.length,
+                      itemBuilder: (context, index) {
+                        final ilan = ilanlar[index];
+                        final userId = ilan['userId'];
+                        final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
 
-                return ListView.builder(
-                  itemCount: ilanlar.length,
-                  itemBuilder: (context, index) {
-                    final ilan = ilanlar[index];
-                    final userId = ilan['userId'];
-                    final aciklama = ilan['aciklama'] ?? 'Açıklama yok';
+                        return FutureBuilder<Map<String, dynamic>?>(
+                          future: _getUserInfo(userId),
+                          builder: (context, userSnapshot) {
+                            if (userSnapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (!userSnapshot.hasData || userSnapshot.data == null) {
+                              return const Text("Kullanıcı bulunamadı");
+                            }
 
-                    return FutureBuilder<Map<String, dynamic>?>(
-                      future: _getUserInfo(userId),
-                      builder: (context, userSnapshot) {
-                        if (userSnapshot.connectionState == ConnectionState.waiting) {
-                          return const ListTile(title: Text("Yükleniyor..."));
-                        }
-                        if (!userSnapshot.hasData || userSnapshot.data == null) {
-                          return const ListTile(title: Text("Kullanıcı bilgisi bulunamadı"));
-                        }
-                        final user = userSnapshot.data!;
-                        final isim = user['isim'];
-                        final soyisim = user['soyisim'];
+                            final user = userSnapshot.data!;
+                            final isim = user['isim'];
+                            final soyisim = user['soyisim'];
 
-                        return ListTile(
-                          leading: const Icon(Icons.spa, color: Colors.brown, size: 28),
-                          title: Text(
-                            "İLAN SAHİBİ: $isim $soyisim",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Text(
-                                "AÇIKLAMA: $aciklama",
-                                style: TextStyle(fontSize: 17, color: Colors.grey[700]),
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(2, 4),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                "İL: ${ilan['il'] ?? 'Bilinmiyor'}",
-                                style: TextStyle(fontSize: 17, color: Colors.grey[700]),
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.spa, color: Colors.brown, size: 28),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "$isim $soyisim",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Açıklama: $aciklama",
+                                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text("İl: ${ilan['il'] ?? 'Bilinmiyor'}",
+                                      style: const TextStyle(fontSize: 13)),
+                                  Text("İlçe: ${ilan['ilce'] ?? 'Bilinmiyor'}",
+                                      style: const TextStyle(fontSize: 13)),
+                                  Text(
+                                    "Fiyat: ${ilan['fiyat'] != null ? ilan['fiyat'].toString() + ' ₺' : 'Belirtilmemiş'}",
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                "İLÇE: ${ilan['ilce'] ?? 'Bilinmiyor'}",
-                                style: TextStyle(fontSize: 17, color: Colors.grey[700]),
-                              ),
-                              Text(
-                                "FİYAT: ${ilan['fiyat'] != null ? ilan['fiyat'].toString() : 'Belirtilmemiş'} ₺",
-                                style: TextStyle(fontSize: 17, color: Colors.grey[700]),
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
                     );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
-  Future<Map<String, dynamic>?> _getUserInfo(String userId) async {
-    final userDoc = await FirebaseFirestore.instance.collection('kullanicilar').doc(userId).get();
-    if (userDoc.exists) {
-      return userDoc.data();
-    }
-    return null;
-  }
 }
+
+
+
 
 
 // NutsScreen: Kuruyemiş ürünleri ana ekranı
