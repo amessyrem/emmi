@@ -1,0 +1,71 @@
+from flask import Flask, request, jsonify
+import random
+import smtplib
+from email.mime.text import MIMEText
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Flutter için CORS
+
+verification_codes = {}
+
+# Gmail SMTP Ayarları
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 465
+SMTP_USERNAME = 'iremaytekin28@gmail.com'       # <-- Buraya Gmail adresini yaz
+SMTP_PASSWORD = 'hlpa huug nluk wkmo'                   # <-- Buraya App Password'u yaz (16 karakterlik)
+
+def send_email(to_email, code):
+    subject = "Doğrulama Kodunuz"
+    body = f"Email doğrulama kodunuz: {code}"
+
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = SMTP_USERNAME
+    msg['To'] = to_email
+
+    try:
+        # SSL bağlantı ile daha güvenli
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.sendmail(SMTP_USERNAME, to_email, msg.as_string())
+        server.quit()
+        print(f"Email gönderildi: {to_email}")
+        return True
+    except Exception as e:
+        print(f"Email gönderme hatası: {e}")
+        return False
+
+@app.route('/send-code', methods=['POST'])
+def send_code():
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'success': False, 'message': 'Email gerekli'}), 400
+
+    code = f"{random.randint(100000, 999999)}"
+    verification_codes[email] = code
+
+    if send_email(email, code):
+        return jsonify({'success': True, 'message': 'Kod gönderildi'})
+    else:
+        return jsonify({'success': False, 'message': 'Kod gönderilemedi'}), 500
+
+@app.route('/verify-code', methods=['POST'])
+def verify_code():
+    data = request.json
+    email = data.get('email')
+    code = data.get('code')
+
+    if not email or not code:
+        return jsonify({'success': False, 'message': 'Email ve kod gerekli'}), 400
+
+    if verification_codes.get(email) == code:
+        verification_codes.pop(email, None)
+        return jsonify({'success': True, 'message': 'Doğrulama başarılı'})
+    else:
+        return jsonify({'success': False, 'message': 'Kod yanlış'}), 400
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
