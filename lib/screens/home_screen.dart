@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                               targetScreen = const VegetablesScreen();
                               break;
                             case 5:
-                              targetScreen = const AllProductsScreen();
+                              targetScreen = const digerScreen();
                               break;
                             default:
                               targetScreen = DetailScreen(index: 0, name: 'Bilinmeyen');
