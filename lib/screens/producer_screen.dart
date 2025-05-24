@@ -1,145 +1,198 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'profile_screen.dart';
 import 'products_screen.dart';
 import 'new_products_screen.dart';
-import 'profile_screen.dart';
 
 class ProducerScreen extends StatefulWidget {
   @override
   _ProducerScreenState createState() => _ProducerScreenState();
 }
 
-class _ProducerScreenState extends State<ProducerScreen> with SingleTickerProviderStateMixin {
-  bool _isProfilePanelVisible = false;
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
+class _ProducerScreenState extends State<ProducerScreen> {
+  String username = "User";  // varsayılan isim
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 300),
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(1, 0), // ekranın sağından başla
-      end: Offset(0, 0),   // ekranın tam içine kaydır
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _fetchUsername();
   }
 
-  void _toggleProfilePanel() {
-    setState(() {
-      _isProfilePanelVisible = !_isProfilePanelVisible;
-      if (_isProfilePanelVisible) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
+  Future<void> _fetchUsername() async {
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('kullanicilar')
+          .doc(user!.uid)
+          .get();
+
+      if (doc.exists && doc.data() != null && doc.data()!.containsKey('isim')) {
+        setState(() {
+          username = doc.data()!['isim'];
+        });
       }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    } catch (e) {
+      // hata durumunda username "User" kalır
+      print("Kullanıcı adı çekilemedi: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Üretici Paneli" , style: TextStyle(color: Colors.white)),
+    final screenHeight = MediaQuery.of(context).size.height;
 
-        backgroundColor: Color(0xFF0D5944),
-        actions: [
-          IconButton(
-            icon: Image.asset(
-              'assets/images/emmim.png',
-              width: 30,
-              height: 30,
-            ),
-            onPressed: _toggleProfilePanel,
-          ),
-        ],
-      ),
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          Container(
-            color: Color(0xFFF1E7E4), // arka plan rengi
+          // Üst yarı arka plan resmi
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.7, // ekran yüksekliğinin %50'si
+            child: Image.asset(
+              'assets/images/backproducer.png',
+              fit: BoxFit.cover,
+            ),
           ),
+
+          // SafeArea ve üst kısım (başlık, geri butonu)
           SafeArea(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.list, size: 30, color: Colors.white),
-                      label: Text(
-                        "İlanlarım",
-                        style: TextStyle(fontSize: 27, color: Colors.white),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back, color: Colors.black, size: 28),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 60),
-                        backgroundColor: Color(0xFF0D5944),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ProductFilterScreen()),
-                        );
-                      },
+                      SizedBox(width: 40), // sağ boşluk
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Merhabalar, $username",
+                    style: TextStyle(
+                      fontSize: 50,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: 35),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.add, size: 30, color: Colors.white),
-                      label: Text(
-                        "Yeni İlan Ekle",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 60),
-                        backgroundColor: Color(0xFF0D5944),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => NewListingScreen()),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // Sağdan kayan profil paneli
-          if (_isProfilePanelVisible)
-            SlideTransition(
-              position: _slideAnimation,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  color: Color(0xFFF1E7E4),
-                  child: Column(
-                    children: [
-                      // Kapatma butonu
-                      Container(
-                        padding: EdgeInsets.only(top: 2, right: 8),
-                        alignment: Alignment.topRight,
-                      ),
-                      Expanded(child: ProfileScreen(onClose: _toggleProfilePanel)),
-                    ],
+          // Alt yarı bar ve butonlar
+          Positioned(
+            bottom: -200, // negatif değerle biraz yukarı çıkarıyoruz
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height * 0.55, // ekranın %55'i kadar yükseklik
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFD1BD98),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 12,
+                    offset: Offset(0, -4),
                   ),
-                ),
+                ],
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.list, size: 28, color: Colors.black),
+                    label: Text(
+                      "İlanlarım",
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 55),
+                      backgroundColor: Color(0xFFF0E4C8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProductFilterScreen()),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.add, size: 28, color: Colors.black),
+                    label: Text(
+                      "Yeni İlan Ekle",
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 55),
+                      backgroundColor: Color(0xFFF0E4C8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NewListingScreen()),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.account_circle, size: 28, color: Colors.black),
+                    label: Text(
+                      "Profilim",
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 55),
+                      backgroundColor: Color(0xFFF0E4C8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(
+                            onClose: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
             ),
+          ),
+
         ],
       ),
     );
   }
+
 }

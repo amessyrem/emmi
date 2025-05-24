@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final VoidCallback onClose; // paneli kapatacak fonksiyon
+  final VoidCallback? onClose;
 
-  const ProfileScreen({required this.onClose});
+  const ProfileScreen({this.onClose});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -16,10 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isPasswordVisible = false;
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserData() {
-    return FirebaseFirestore.instance
-        .collection('kullanicilar')
-        .doc(user!.uid)
-        .get();
+    return FirebaseFirestore.instance.collection('kullanicilar').doc(user!.uid).get();
   }
 
   Widget buildInfoBox(String label, String value, {bool isPassword = false}) {
@@ -28,15 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2))],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -47,18 +38,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   TextSpan(
                     text: "$label: ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87, fontSize: 16),
                   ),
                   TextSpan(
                     text: isPassword && !_isPasswordVisible ? "********" : value,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.black54, fontSize: 16),
                   ),
                 ],
               ),
@@ -66,10 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           if (isPassword)
             IconButton(
-              icon: Icon(
-                _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey[600],
-              ),
+              icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility, color: Colors.grey[600]),
               onPressed: () {
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
@@ -83,78 +64,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color(0xFFD5EDD4),
-      child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: getUserData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return Center(child: CircularProgressIndicator());
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text('Profilim', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (widget.onClose != null) {
+              widget.onClose!();
+            } else {
+              Navigator.pop(context);
+            }
+          },
+        ),
+      ),
+      body: Stack(
+        children: [
+          // Arka plan resmi full screen
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/backproducer.png',
+              fit: BoxFit.cover,
+            ),
+          ),
 
-          if (snapshot.hasError)
-            return Center(child: Text("Bir hata oluştu."));
+          // Üstüne siyah yarı saydam filtre
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+            ),
+          ),
 
-          if (!snapshot.hasData || !snapshot.data!.exists)
-            return Center(child: Text("Kullanıcı verisi bulunamadı."));
+          // İçerik, SafeArea ile status bar ve çentik bölgesine saygı gösterir
+          SafeArea(
+            child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              future: getUserData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  return Center(child: CircularProgressIndicator());
 
-          var userData = snapshot.data!.data()!;
+                if (snapshot.hasError)
+                  return Center(child: Text("Bir hata oluştu.", style: TextStyle(color: Colors.white)));
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Üst başlık ve kapatma butonu
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  width: double.infinity,
-                  color: Color(0xFF0D5944),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          'Profilim',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: widget.onClose,
-                          child: Icon(Icons.close, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
+                if (!snapshot.hasData || !snapshot.data!.exists)
+                  return Center(child: Text("Kullanıcı verisi bulunamadı.", style: TextStyle(color: Colors.white)));
+
+                var userData = snapshot.data!.data()!;
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
+                      SizedBox(height: kToolbarHeight + 20), // AppBar altından başlayacak şekilde boşluk
                       CircleAvatar(
                         radius: 60,
                         backgroundColor: Color(0xFF0D5944),
-                        child: Icon(
-                          Icons.person,
-                          size: 80,
-                          color: Colors.white,
-                        ),
+                        child: Icon(Icons.person, size: 80, color: Colors.white),
                       ),
                       SizedBox(height: 24),
                       buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
                       buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
                       buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
-                      buildInfoBox("Şifre", userData.containsKey('sifre') ? userData['sifre'] : "********", isPassword: true),
+                      buildInfoBox(
+                        "Şifre",
+                        userData.containsKey('sifre') ? userData['sifre'] : "********",
+                        isPassword: true,
+                      ),
+                      SizedBox(height: 20), // Alt boşluk
                     ],
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
