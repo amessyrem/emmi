@@ -77,226 +77,223 @@ class _NewListingScreenState extends State<NewListingScreen> {
         title: Text('Yeni Ürün', style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFF0D5944),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Kategori Seç', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: selectedCategory,
-              items: categoryMap.keys.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Kategori seç',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value;
-                  selectedSubcategory = null;
-                });
-              },
-            ),
-            if (selectedCategory != null) ...[
-              SizedBox(height: 16),
-              Text('Alt Kategori Seç', style: TextStyle(fontSize: 16)),
-              SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: selectedSubcategory,
-                items: categoryMap[selectedCategory!]!.map((subcategory) {
-                  return DropdownMenuItem(
-                    value: subcategory,
-                    child: Text(subcategory),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Alt kategori seç',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    selectedSubcategory = value;
-                  });
-                },
-              ),
-            ],
+            buildDropdownSection(),
             SizedBox(height: 16),
-            Text('İl Seç', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            isLoadingCities
-                ? Center(child: CircularProgressIndicator())
-                : DropdownButtonFormField<String>(
-              value: selectedCity,
-              items: cities.map((city) {
-                return DropdownMenuItem(
-                  value: city,
-                  child: Text(city),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'İl seç',
-              ),
-              onChanged: (value) async {
-                setState(() {
-                  selectedCity = value;
-                  selectedDistrict = null;
-                  isLoadingDistricts = true;
-                });
-
-                try {
-                  final districtList = await fetchDistricts(value!);
-                  setState(() {
-                    districts = districtList;
-                    isLoadingDistricts = false;
-                  });
-                } catch (e) {
-                  print("İlçeler alınamadı: $e");
-                }
-              },
-            ),
-            if (selectedCity != null) ...[
-              SizedBox(height: 16),
-              Text('İlçe Seç', style: TextStyle(fontSize: 16)),
-              SizedBox(height: 8),
-              isLoadingDistricts
-                  ? Center(child: CircularProgressIndicator())
-                  : DropdownButtonFormField<String>(
-                value: selectedDistrict,
-                items: districts.map((ilce) {
-                  return DropdownMenuItem(
-                    value: ilce,
-                    child: Text(ilce),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'İlçe seç',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    selectedDistrict = value;
-                  });
-                },
-              ),
-            ],
+            buildCityDropdown(),
             SizedBox(height: 16),
-            Text('Fiyat (TL)', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            TextField(
-              controller: priceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Fiyat giriniz',
-                suffixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: Icon(Icons.currency_lira),
-                ),
-              ),
-            ),
+            if (selectedCity != null) buildDistrictDropdown(),
             SizedBox(height: 16),
-            Text('Açıklama', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            TextField(
-              controller: descriptionController,
-              maxLines: 5,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Ürün detaylarını giriniz...',
-              ),
-            ),
-            Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final category = selectedCategory;
-                  final subcategory = selectedSubcategory;
-                  final city = selectedCity;
-                  final district = selectedDistrict;
-                  final description = descriptionController.text;
-                  final priceText = priceController.text;
-
-                  if (category == null || subcategory == null || city == null || district == null || description.isEmpty || priceText.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Lütfen tüm alanları doldurunuz.")),
-                    );
-                    return;
-                  }
-
-<<<<<<< HEAD
-                  double? price = double.tryParse(priceText);
-                  if (price == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Lütfen geçerli bir fiyat giriniz.")),
-=======
-
-
-                  final currentUser = FirebaseAuth.instance.currentUser;
-
-                  if (currentUser == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Kullanıcı oturumu açık değil.")),
->>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
-                    );
-                    return;
-                  }
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
-                  try {
-                    await FirebaseFirestore.instance.collection('ilanlar').add({
-                      'userId': currentUser.uid,
-                      'kategori': category,
-<<<<<<< HEAD
-                      'altKategori': subcategory,
-                      'il': city,
-                      'ilce': district,
-                      'fiyat': price,
-=======
-                      'altKategori': subcategory.toLowerCase(),
->>>>>>> 11e8023 (uygulama için tasarlanan logo eklendi, sayfalarda düzenlemeler yapıldı, email doğrulama işlemine devam ediliyor.)
-                      'aciklama': description,
-                      'createdAt': FieldValue.serverTimestamp(),
-                    });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Ürün başarıyla kaydedildi.")),
-                    );
-
-                    setState(() {
-                      selectedCategory = null;
-                      selectedSubcategory = null;
-                      selectedCity = null;
-                      selectedDistrict = null;
-                      descriptionController.clear();
-                      priceController.clear();
-                    });
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Hata oluştu: $e")),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0D5944),
-                ),
-                child: Text("Ürünü Kaydet", style: TextStyle(color: Colors.white)),
-              ),
-            ),
+            buildPriceField(),
+            SizedBox(height: 16),
+            buildDescriptionField(),
+            SizedBox(height: 24),
+            buildSubmitButton(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildDropdownSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Kategori Seç', style: TextStyle(fontSize: 16)),
+        SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: selectedCategory,
+          items: categoryMap.keys.map((category) {
+            return DropdownMenuItem(value: category, child: Text(category));
+          }).toList(),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'Kategori seç',
+          ),
+          onChanged: (value) {
+            setState(() {
+              selectedCategory = value;
+              selectedSubcategory = null;
+            });
+          },
+        ),
+        if (selectedCategory != null) ...[
+          SizedBox(height: 16),
+          Text('Alt Kategori Seç', style: TextStyle(fontSize: 16)),
+          SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: selectedSubcategory,
+            items: categoryMap[selectedCategory!]!.map((subcategory) {
+              return DropdownMenuItem(value: subcategory, child: Text(subcategory));
+            }).toList(),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Alt kategori seç',
+            ),
+            onChanged: (value) {
+              setState(() {
+                selectedSubcategory = value;
+              });
+            },
+          ),
+        ]
+      ],
+    );
+  }
+
+  Widget buildCityDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('İl Seç', style: TextStyle(fontSize: 16)),
+        SizedBox(height: 8),
+        isLoadingCities
+            ? Center(child: CircularProgressIndicator())
+            : DropdownButtonFormField<String>(
+          value: selectedCity,
+          items: cities.map((city) {
+            return DropdownMenuItem(value: city, child: Text(city));
+          }).toList(),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'İl seç',
+          ),
+          onChanged: (value) async {
+            setState(() {
+              selectedCity = value;
+              selectedDistrict = null;
+              isLoadingDistricts = true;
+            });
+            try {
+              final districtList = await fetchDistricts(value!);
+              setState(() {
+                districts = districtList;
+                isLoadingDistricts = false;
+              });
+            } catch (e) {
+              print("İlçeler alınamadı: $e");
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget buildDistrictDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('İlçe Seç', style: TextStyle(fontSize: 16)),
+        SizedBox(height: 8),
+        isLoadingDistricts
+            ? Center(child: CircularProgressIndicator())
+            : DropdownButtonFormField<String>(
+          value: selectedDistrict,
+          items: districts.map((ilce) {
+            return DropdownMenuItem(value: ilce, child: Text(ilce));
+          }).toList(),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'İlçe seç',
+          ),
+          onChanged: (value) {
+            setState(() {
+              selectedDistrict = value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget buildPriceField() {
+    return TextField(
+      controller: priceController,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: 'Fiyat giriniz',
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 12.0),
+          child: Icon(Icons.currency_lira),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDescriptionField() {
+    return TextField(
+      controller: descriptionController,
+      maxLines: 5,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: 'Ürün detaylarını giriniz...',
+      ),
+    );
+  }
+
+  Widget buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () async {
+          final category = selectedCategory;
+          final subcategory = selectedSubcategory;
+          final city = selectedCity;
+          final district = selectedDistrict;
+          final description = descriptionController.text;
+          final priceText = priceController.text;
+
+          if (category == null || subcategory == null || city == null || district == null || description.isEmpty || priceText.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lütfen tüm alanları doldurunuz.")));
+            return;
+          }
+
+          double? price = double.tryParse(priceText);
+          if (price == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lütfen geçerli bir fiyat giriniz.")));
+            return;
+          }
+
+          final currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Kullanıcı oturumu açık değil.")));
+            return;
+          }
+
+          try {
+            await FirebaseFirestore.instance.collection('ilanlar').add({
+              'userId': currentUser.uid,
+              'kategori': category,
+              'altKategori': subcategory.toLowerCase(),
+              'il': city,
+              'ilce': district,
+              'fiyat': price,
+              'aciklama': description,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Ürün başarıyla kaydedildi.")));
+
+            setState(() {
+              selectedCategory = null;
+              selectedSubcategory = null;
+              selectedCity = null;
+              selectedDistrict = null;
+              descriptionController.clear();
+              priceController.clear();
+            });
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Hata oluştu: $e")));
+          }
+        },
+        style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF0D5944)),
+        child: Text("Ürünü Kaydet", style: TextStyle(color: Colors.white)),
       ),
     );
   }
