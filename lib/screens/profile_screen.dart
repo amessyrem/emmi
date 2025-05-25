@@ -25,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Color(0xFFF0E4C8),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2))],
       ),
@@ -70,10 +70,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Profilim', style: TextStyle(color: Colors.white)),
+        title: Text('Profilim', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             if (widget.onClose != null) {
               widget.onClose!();
@@ -85,22 +85,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Stack(
         children: [
-          // Arka plan resmi full screen
           Positioned.fill(
             child: Image.asset(
               'assets/images/backproducer.png',
               fit: BoxFit.cover,
             ),
           ),
-
-          // Üstüne siyah yarı saydam filtre
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.3),
             ),
           ),
-
-          // İçerik, SafeArea ile status bar ve çentik bölgesine saygı gösterir
           SafeArea(
             child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
               future: getUserData(),
@@ -118,25 +113,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 return SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      SizedBox(height: kToolbarHeight + 20), // AppBar altından başlayacak şekilde boşluk
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor: Color(0xFF0D5944),
-                        child: Icon(Icons.person, size: 80, color: Colors.white),
-                      ),
-                      SizedBox(height: 24),
-                      buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
-                      buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
-                      buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
-                      buildInfoBox(
-                        "Şifre",
-                        userData.containsKey('sifre') ? userData['sifre'] : "********",
-                        isPassword: true,
-                      ),
-                      SizedBox(height: 20), // Alt boşluk
-                    ],
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+                    child: Column(
+                      children: [
+                        SizedBox(height: kToolbarHeight + 20),
+                        CircleAvatar(
+                          radius: 90,
+                          backgroundColor: Color(0xFF000000),
+                          child: Icon(Icons.person, size: 140, color: Color(0xFFF0E4C8)),
+                        ),
+                        SizedBox(height: 24),
+                        buildInfoBox("İsim", userData['isim'] ?? "Bilgi yok"),
+                        buildInfoBox("Soyisim", userData['soyisim'] ?? "Bilgi yok"),
+                        buildInfoBox("E-mail", userData['email'] ?? "Bilgi yok"),
+                        buildInfoBox(
+                          "Şifre",
+                          userData.containsKey('sifre') ? userData['sifre'] : "********",
+                          isPassword: true,
+                        ),
+                        SizedBox(height: 40), // ekstra alt boşluk
+                      ],
+                    ),
                   ),
                 );
               },
