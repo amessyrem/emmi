@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'tel_dogrulama.dart';
 
 class ProfileScreen extends StatefulWidget {
   final VoidCallback? onClose;
@@ -25,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Color(0xFFF0E4C8),
+        color: Color(0xFFF0E4C8).withOpacity(0.8),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, 2))],
       ),
@@ -120,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: kToolbarHeight + 20),
                         CircleAvatar(
                           radius: 90,
-                          backgroundColor: Color(0xFF000000),
+                          backgroundColor: Color(0xFF000000).withOpacity(0.6),
                           child: Icon(Icons.person, size: 140, color: Color(0xFFF0E4C8)),
                         ),
                         SizedBox(height: 24),
@@ -132,6 +133,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           userData.containsKey('sifre') ? userData['sifre'] : "********",
                           isPassword: true,
                         ),
+
+                        buildInfoBox(
+                          "Telefon",
+                          user!.phoneNumber ?? "Telefon numarası doğrulanmamış",
+                        ),
+                        if (user!.phoneNumber == null)
+                          ElevatedButton(
+                            onPressed: () {
+                              // Burada doğrulama ekranına yönlendireceğiz
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => PhoneVerificationScreen()),
+                              );
+                            },
+                            child: Text("Telefon Numarasını Doğrula"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black.withOpacity(0.3),
+                              foregroundColor: Color(0xFFF0E4C8),
+                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+
+
                         SizedBox(height: 40), // ekstra alt boşluk
                       ],
                     ),
