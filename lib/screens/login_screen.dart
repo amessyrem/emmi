@@ -3,6 +3,7 @@ import 'register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
 import 'producer_screen.dart';
+import 'forgot_password_page.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -127,6 +128,23 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(color: Colors.black87),
                       ),
                     ),
+                    SizedBox(height:0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                        );
+                      },
+                      child: Text(
+                        "Şifremi Unuttum",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+
                   ],
                 ),
               ),
