@@ -3,14 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class digerScreen extends StatefulWidget {
-  const digerScreen({Key? key}) : super(key: key);
+class YardimScreen extends StatefulWidget {
+  const YardimScreen({Key? key}) : super(key: key);
 
   @override
-  _digerScreenState createState() => _digerScreenState();
+  _YardimScreenState createState() => _YardimScreenState();
 }
 
-class _digerScreenState extends State<digerScreen> {
+class _YardimScreenState extends State<YardimScreen> {
   String? selectedIl;
   String? selectedIlce;
 
@@ -84,7 +84,8 @@ class _digerScreenState extends State<digerScreen> {
   Widget build(BuildContext context) {
     Query ilanQuery = FirebaseFirestore.instance
         .collection('ilanlar')
-        .where('kategori', isEqualTo: "Diğer");
+        .where('kategori', isEqualTo: "Yardımlaşma")
+        .where('altKategori', isEqualTo: "ilanlar");
 
     if (selectedIl != null && selectedIl!.isNotEmpty) {
       ilanQuery = ilanQuery.where('il', isEqualTo: selectedIl);
@@ -98,7 +99,7 @@ class _digerScreenState extends State<digerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Diğer Kategori İlanları", style: TextStyle(color: Colors.black)),
+        title: const Text("Yardımlaşma İlanları", style: TextStyle(color: Colors.black)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -109,7 +110,7 @@ class _digerScreenState extends State<digerScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/backhayvansal.png',
+              'assets/images/yardım.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -226,7 +227,7 @@ class _digerScreenState extends State<digerScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.spa, color: Colors.brown, size: 28),
+                                  const Icon(Icons.volunteer_activism, color: Colors.green, size: 28),
                                   const SizedBox(height: 6),
                                   Text(
                                     "$isim $soyisim",
@@ -244,10 +245,8 @@ class _digerScreenState extends State<digerScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
-                                  Text("İl: ${ilan['il'] ?? 'Bilinmiyor'}",
-                                      style: const TextStyle(fontSize: 13)),
-                                  Text("İlçe: ${ilan['ilce'] ?? 'Bilinmiyor'}",
-                                      style: const TextStyle(fontSize: 13)),
+                                  Text("İl: ${ilan['il'] ?? 'Bilinmiyor'}", style: const TextStyle(fontSize: 13)),
+                                  Text("İlçe: ${ilan['ilce'] ?? 'Bilinmiyor'}", style: const TextStyle(fontSize: 13)),
                                   Text(
                                     "Fiyat: ${ilan['fiyat'] != null ? ilan['fiyat'].toString() + ' ₺' : 'Belirtilmemiş'}",
                                     style: const TextStyle(fontSize: 13),

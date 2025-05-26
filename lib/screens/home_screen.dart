@@ -7,7 +7,7 @@ import 'categories/hayvansal_screen.dart';
 import 'categories/nuts_screen.dart';
 import 'categories/fruits_screen.dart';
 import 'categories/vegetables_screen.dart';
-import 'categories/all_products_screen.dart';
+import 'categories/yardımlasma_screen.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
     'Kuruyemiş',
     'Meyve',
     'Sebze',
-    'Tüm Ürünler',
+    'Yardımlaşma',
   ];
 
   final List<String> boxImages = [
@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
     'assets/images/nuts.png',
     'assets/images/fruit.png',
     'assets/images/vegetables.png',
-    'assets/images/all.png',
+    'assets/images/elsıkısma.png',
   ];
 
   @override
@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                               targetScreen = const VegetablesScreen();
                               break;
                             case 5:
-                              targetScreen = const digerScreen();
+                              targetScreen = const YardimScreen();
                               break;
                             default:
                               targetScreen = DetailScreen(index: 0, name: 'Bilinmeyen');
