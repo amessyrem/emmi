@@ -114,7 +114,7 @@ class _SebzeSahipleriEkraniState extends State<SebzeSahipleriEkrani> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background3.png',//background burda
+              'assets/images/sebzeekranı.png',//background burda
               fit: BoxFit.cover,
             ),
           ),
@@ -274,12 +274,6 @@ class _SebzeSahipleriEkraniState extends State<SebzeSahipleriEkrani> {
   }
 }
 
-
-
-
-
-
-
 class VegetablesScreen extends StatelessWidget {
   const VegetablesScreen({Key? key}) : super(key: key);
 
@@ -290,7 +284,7 @@ class VegetablesScreen extends StatelessWidget {
       {"isim": "Domates", "resim": "assets/images/domates.png"},
       {"isim": "Patlıcan", "resim": "assets/images/patlıcan.png"},
       {"isim": "Salatalık", "resim": "assets/images/salatalık.png"},
-      {"isim": "Ispanak", "resim": "assets/images/ispanak.png"},
+      {"isim": "Ispanak", "resim": "assets/images/ıspanak.png"},
       {"isim": "Biber", "resim": "assets/images/biber.png"},
     ];
 
@@ -299,51 +293,61 @@ class VegetablesScreen extends StatelessWidget {
         title: const Text("Sebze Ürünleri", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF0D5944),
       ),
-      backgroundColor: const Color(0xFFF1E7E4),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: vegetables.map((urun) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SebzeSahipleriEkrani(altKategori: urun["isim"]!),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/sebzeekranı.png', // ARKA PLAN RESMİ
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: vegetables.map((urun) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SebzeSahipleriEkrani(altKategori: urun["isim"]!),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0x77FFFFFF), // Hafif beyaz arka plan
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          urun["resim"]!,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 50),
+                        Text(
+                          urun["isim"]!,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0x106FAF37),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      urun["resim"]!,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 50),
-                    Text(
-                      urun["isim"]!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+

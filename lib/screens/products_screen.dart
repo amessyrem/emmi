@@ -21,6 +21,8 @@ class _ProductFilterScreenState extends State<ProductFilterScreen> {
     'Sebze': ['patates', 'domates', 'patlıcan', 'salatalık', 'ıspanak', 'biber'],
     'Kuruyemiş': ['ay çekirdeği', 'ceviz', 'fındık', 'leblebi', 'yer fıstığı', 'badem'],
     'Hayvansal Ürünler': ['süt', 'yoğurt', 'bal', 'peynir', 'yağ', 'yumurta'],
+    'Yardımlaşma': ['ilanlar'],
+
   };
 
   List<String> cities = [];

@@ -113,7 +113,7 @@ class _KuruyemisSahipleriEkraniState extends State<KuruyemisSahipleriEkrani> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background3.png',//background burda
+              'assets/images/kuruyemis.png',//background burda
               fit: BoxFit.cover,
             ),
           ),
@@ -297,51 +297,59 @@ class NutsScreen extends StatelessWidget {
         title: const Text("Kuruyemiş Ürünleri", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF0D5944),
       ),
-      backgroundColor: const Color(0xFFF1E7E4),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: nuts.map((urun) {
-            return InkWell(
-              onTap: () {
-                // Tıklanınca KuruyemisSahipleriEkrani sayfasını aç
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => KuruyemisSahipleriEkrani(altKategori: urun["isim"]!),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/kuruyemis.png', // Arka plan resmi
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: nuts.map((urun) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KuruyemisSahipleriEkrani(altKategori: urun["isim"]!),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0x77FFFFFF),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          urun["resim"]!,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 50),
+                        Text(
+                          urun["isim"]!,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0x106FAF37),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      urun["resim"]!,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 50),
-                    Text(
-                      urun["isim"]!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

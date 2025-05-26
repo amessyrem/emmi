@@ -10,7 +10,7 @@ class BakliyatEkrani extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Map<String, String>> bakliyatlar = [
       {"isim": "Nohut", "resim": "assets/images/nohut.png"},
-      {"isim": "Mercimek", "resim": "assets/images/mercimek.png"},
+      {"isim": "Mercimek", "resim": "assets/images/kırmızı.png"},
       {"isim": "Fasulye", "resim": "assets/images/fasulye.png"},
       {"isim": "Barbunya", "resim": "assets/images/barbunya.png"},
       {"isim": "Bezelye", "resim": "assets/images/beans-161504_1280.png"},
@@ -22,52 +22,61 @@ class BakliyatEkrani extends StatelessWidget {
         title: const Text("Bakliyat Ürünleri", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF0D5944),
       ),
-      backgroundColor: const Color(0xFFF1E7E4),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: bakliyatlar.map((urun) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BakliyatSahipleriEkrani(altKategori: urun["isim"]!),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background3.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            children: bakliyatlar.map((urun) {
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          BakliyatSahipleriEkrani(altKategori: urun["isim"]!),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0x77FFFFFF),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0x106FAF37),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      urun["resim"]!,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 50),
-                    Text(
-                      urun["isim"]!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        urun["resim"]!,
+                        height: 100,
+                        fit: BoxFit.contain,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 50),
+                      Text(
+                        urun["isim"]!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
+
   }
 }
 

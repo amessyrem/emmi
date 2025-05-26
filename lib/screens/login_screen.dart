@@ -116,34 +116,50 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    TextButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => RegisterScreen()),
                         );
                       },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Color(0xFF0D5944)),
+                        minimumSize: Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Color(0xFF0D5944),
+                      ),
                       child: Text(
                         "Hesabınız yok mu? Kayıt Ol",
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    SizedBox(height:0),
-                    TextButton(
+                    SizedBox(height: 20),
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
                         );
                       },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Color(0xFF1B9D62)),
+                        minimumSize: Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Color(0xFF1B9D62),
+                      ),
                       child: Text(
                         "Şifremi Unuttum",
                         style: TextStyle(
-                          color: Colors.black87,
-                          decoration: TextDecoration.underline,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.none,
                         ),
                       ),
                     ),
+
 
                   ],
                 ),

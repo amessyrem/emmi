@@ -87,6 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: "İsim",
                       fillColor: Color(0xCDF7FFDD),
+                      prefixIcon: Icon(Icons.person),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -99,6 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: "Soyisim",
                       fillColor: Color(0xCDF7FFDD),
+                      prefixIcon: Icon(Icons.person),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -111,9 +113,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: "E-mail",
                       fillColor: Color(0xCDF7FFDD),
+                      prefixIcon: Icon(Icons.mail),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
+
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                   ),
@@ -124,6 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Şifre",
+                      prefixIcon: Icon(Icons.lock),
                       fillColor: Color(0xCDF7FFDD),
                       filled: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

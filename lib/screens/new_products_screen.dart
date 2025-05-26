@@ -23,6 +23,8 @@ class _NewListingScreenState extends State<NewListingScreen> {
     'Kuruyemiş': ['ay çekirdeği', 'ceviz', 'fındık', 'leblebi', 'yer fıstığı', 'badem'],
     'Meyve': ['elma', 'armut', 'portakal', 'kayısı', 'şeftali', 'çilek'],
     'Sebze': ['patates', 'domates', 'patlıcan', 'salatalık', 'ıspanak', 'biber'],
+    'Yardımlaşma': ['ilanlar'],
+
   };
 
   List<String> cities = [];
