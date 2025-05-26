@@ -301,15 +301,23 @@ class _ProductFilterScreenState extends State<ProductFilterScreen> {
                                           .doc(ilan.id)
                                           .delete();
 
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text("İlan silindi.")),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text("İlan silinirken hata oluştu.")),
-                                      );
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("İlan silindi.")),
+                                        );
+                                      }
+                                    } catch (e, stacktrace) {
+                                      print("İlan silme hatası: $e");
+                                      print("Stacktrace: $stacktrace");
+
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("İlan silinirken hata oluştu: $e")),
+                                        );
+                                      }
                                     }
                                   }
+
                                 },
                               ),
                             ),
