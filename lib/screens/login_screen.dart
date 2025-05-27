@@ -116,46 +116,38 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    OutlinedButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => RegisterScreen()),
                         );
                       },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Color(0xFF0D5944)),
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        foregroundColor: Colors.white,
-                        backgroundColor: Color(0xFF0D5944),
-                      ),
                       child: Text(
                         "Hesabınız yok mu? Kayıt Ol",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    OutlinedButton(
-                      onPressed: () {
+                    SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
                         );
                       },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Color(0xFF1B9D62)),
-                        minimumSize: Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        foregroundColor: Colors.white,
-                        backgroundColor: Color(0xFF1B9D62),
-                      ),
                       child: Text(
                         "Şifremi Unuttum",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.none,
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),

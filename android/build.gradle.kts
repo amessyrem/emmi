@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.0.2")  // Senin sürümüne göre olabilir
+        classpath("com.google.gms:google-services:4.3.15")  // Firebase plugin'i için
+    }
+}
+
+
+
 allprojects {
     repositories {
         google()
@@ -19,3 +32,4 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
