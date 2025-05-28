@@ -1,25 +1,74 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_screen.dart';
 import 'producer_screen.dart';
 import 'forgot_password_page.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final FocusNode usernameFocusNode = FocusNode();//bunu da klavye çin
+  final FocusNode usernameFocusNode = FocusNode();
+
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Lütfen tüm alanları doldurun!")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: username,
+        password: password,
+      );
+
+      setState(() => _isLoading = false);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProducerScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => _isLoading = false);
+
+      String message = "Bir hata oluştu.";
+      if (e.code == 'user-not-found') {
+        message = "Kullanıcı bulunamadı.";
+      } else if (e.code == 'wrong-password') {
+        message = "Hatalı şifre.";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //resizeToAvoidBottomInset: true,//bunu da kalvye için keledik
       appBar: AppBar(
-        title: Text("Kullanıcı Girişi" , style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF0D5944),
+        title: const Text("Kullanıcı Girişi", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0D5944),
       ),
-      backgroundColor: Color(0xFFF1E7E4), // BEYAZ DI DEGİSTİRDİM BİDAHA BAKARSIN
-
+      backgroundColor: const Color(0xFFF1E7E4),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -27,7 +76,6 @@ class LoginScreen extends StatelessWidget {
             'assets/images/background.jpg',
             fit: BoxFit.cover,
           ),
-          // Sayfanın geri kalan içeriği
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -36,86 +84,59 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 100),
+                    const SizedBox(height: 100),
                     Image.asset(
                       'assets/images/emmim.png',
                       width: 200,
                       height: 200,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: usernameController,
                       decoration: InputDecoration(
-                        fillColor: Color(0xCDF7FFDD),
+                        fillColor: const Color(0xCDF7FFDD),
                         filled: true,
                         labelText: "E-mail",
                         hintText: "E-mail girin",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        prefixIcon: Icon(Icons.person),
+                        prefixIcon: const Icon(Icons.person),
                       ),
                       textInputAction: TextInputAction.next,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        fillColor: Color(0xCDF7FFDD),
+                        fillColor: const Color(0xCDF7FFDD),
                         filled: true,
                         labelText: "Şifre",
                         hintText: "Şifrenizi girin",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        prefixIcon: Icon(Icons.lock),
+                        prefixIcon: const Icon(Icons.lock),
                       ),
                       textInputAction: TextInputAction.done,
                     ),
-                    SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final username = usernameController.text.trim();
-                        final password = passwordController.text;
-
-                        if (username.isEmpty || password.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Lütfen tüm alanları doldurun!")),
-                          );
-                          return;
-                        }
-
-                        try {
-                          await FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: username,
-                            password: password,
-                          );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProducerScreen()),
-                          );
-                        } on FirebaseAuthException catch (e) {
-                          String message = "Bir hata oluştu.";
-                          if (e.code == 'user-not-found') {
-                            message = "Kullanıcı bulunamadı.";
-                          } else if (e.code == 'wrong-password') {
-                            message = "Hatalı şifre.";
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-                        }
-                      },
-                      child: Text("Giriş Yap"),
+                    const SizedBox(height: 30),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                      onPressed: _login,
+                      child: const Text("Giriş Yap"),
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
+                        minimumSize: const Size(double.infinity, 50),
                         foregroundColor: Colors.white,
-                        backgroundColor: Color(0xFF0D5944),
+                        backgroundColor: const Color(0xFF0D5944),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -123,7 +144,7 @@ class LoginScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => RegisterScreen()),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         "Hesabınız yok mu? Kayıt Ol",
                         style: TextStyle(
                           color: Colors.black,
@@ -133,15 +154,15 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
                         );
                       },
-                      child: Text(
+                      child: const Text(
                         "Şifremi Unuttum",
                         style: TextStyle(
                           color: Colors.black,
@@ -151,8 +172,6 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
               ),

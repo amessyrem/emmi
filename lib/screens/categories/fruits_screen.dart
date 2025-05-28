@@ -272,9 +272,6 @@ class _MeyveSahipleriEkraniState extends State<MeyveSahipleriEkrani> {
   }
 }
 
-
-
-
 class FruitsScreen extends StatelessWidget {
   const FruitsScreen({Key? key}) : super(key: key);
 
