@@ -1,7 +1,6 @@
 # emmi
 
-A new Flutter project.
-
+Our new mobile app project for Software Engineering class.
 ## Getting Started
 
 This project is a starting point for a Flutter application.
